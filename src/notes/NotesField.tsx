@@ -2,6 +2,7 @@ import React from "react";
 import Note from "./Note";
 import CloseNoteButton from "./CloseNoteButton";
 import DeleteNoteButton from "./DeleteNoteButton";
+import MarksField from "./MarksField";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   addNote,
@@ -10,13 +11,15 @@ import {
   closeStoredNote,
   createNoteHeader,
   createNoteTextOfNote,
+  saveNoteIndex,
   changeHeaderValue,
-  changeHeaderIndex,
   changeTextOfNoteValue,
-  changeTextOfNoteIndex,
   deleteEmptyNote,
   deleteExistingNote,
-  dataStore
+  dataStore,
+  saveNoteStatus,
+  addMarkCreatedNote,
+  addMarkOpenedNote
 } from "../features/dataStore/dataStoreSlice";
 
 export default function NotesField(): JSX.Element {
@@ -58,49 +61,56 @@ export default function NotesField(): JSX.Element {
     return dispatch(createNoteTextOfNote(event.target.value));
   }
 
-  function openThisNote(index: number) {
-    return dispatch(openStoredNote(index)), dispatch(switchNoteStatus("open"));
+  function rememberOpenedNote(index: number) {
+    return dispatch(saveNoteIndex(index));
   }
 
-  function closeThisNote(index: number) {
-    if (appData.notesStore[index].header === "") {
+  function openThisNote() {
+    return dispatch(openStoredNote()), dispatch(switchNoteStatus("open"));
+  }
+
+  function closeThisNote() {
+    if (appData.notesStore[appData.noteIndex].header === "") {
       return alert("You mast create header of note");
     } else {
       return (
-        dispatch(closeStoredNote(index)), dispatch(switchNoteStatus("show all"))
+        dispatch(closeStoredNote()), dispatch(switchNoteStatus("show all"))
       );
     }
   }
 
-  function changeHeader(
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    index: number
-  ) {
-    return (
-      dispatch(changeHeaderValue(event.target.value)),
-      dispatch(changeHeaderIndex(index))
-    );
+  function changeHeader(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    return dispatch(changeHeaderValue(event.target.value));
   }
 
-  function changeTextOfNote(
-    event: React.ChangeEvent<HTMLTextAreaElement>,
-    index: number
-  ) {
-    return (
-      dispatch(changeTextOfNoteValue(event.target.value)),
-      dispatch(changeTextOfNoteIndex(index))
-    );
+  function changeTextOfNote(event: React.ChangeEvent<HTMLTextAreaElement>) {
+    return dispatch(changeTextOfNoteValue(event.target.value));
   }
 
-  function deleteSelectedNote(index: number) {
+  function deleteSelectedNote() {
     return (
-      dispatch(deleteExistingNote(index)),
-      dispatch(switchNoteStatus("show all"))
+      dispatch(deleteExistingNote()), dispatch(switchNoteStatus("show all"))
     );
   }
 
   function deleteCreatingNote() {
     return dispatch(deleteEmptyNote()), dispatch(switchNoteStatus("show all"));
+  }
+
+  function showMarksField() {
+    return dispatch(saveNoteStatus()), dispatch(switchNoteStatus("add mark"));
+  }
+
+  function returnFromMarks() {
+    return dispatch(switchNoteStatus(appData.noteStatusHolder));
+  }
+
+  function addMarkInsideNote() {
+    if (appData.noteStatusHolder === "creating") {
+      return dispatch(addMarkCreatedNote());
+    } else if (appData.noteStatusHolder === "open") {
+      return dispatch(addMarkOpenedNote());
+    }
   }
 
   const createdNotes = appData.notesStore.map((note, index) => {
@@ -109,39 +119,46 @@ export default function NotesField(): JSX.Element {
     });
 
     return (
-      <div key={index}>
-        <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
-        <div
-          onClick={() => openThisNote(index)}
-          onKeyPress={() => openThisNote(index)}
-        >
+      <div
+        key={index}
+        onClick={() => rememberOpenedNote(index)}
+        onKeyPress={() => rememberOpenedNote(index)}
+      >
+        <DeleteNoteButton deleteThisNote={deleteSelectedNote} />
+        <div onClick={openThisNote} onKeyPress={openThisNote}>
           <Note
             headerValue={note.header}
             textOfNoteValue={note.textOfNote}
-            headerOnChange={(event) => changeHeader(event, index)}
-            textOfNoteOnChange={(event) => changeTextOfNote(event, index)}
+            headerOnChange={changeHeader}
+            textOfNoteOnChange={changeTextOfNote}
           />
           {marksOfNotes}
         </div>
         {appData.notesStore[index].opened && (
-          <CloseNoteButton closeThisNote={() => closeThisNote(index)} />
+          <CloseNoteButton closeThisNote={closeThisNote} />
         )}
       </div>
     );
   });
 
   const openedNote = appData.notesStore.map((note, index) => {
+    const marksOfNotes = note.marks.map((mark) => {
+      return <div key={mark}>{mark}</div>;
+    });
+
     return (
       note.opened === true && (
         <div key={index}>
-          <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
+          <DeleteNoteButton deleteThisNote={deleteSelectedNote} />
           <Note
             headerValue={note.header}
             textOfNoteValue={note.textOfNote}
-            headerOnChange={(event) => changeHeader(event, index)}
-            textOfNoteOnChange={(event) => changeTextOfNote(event, index)}
+            headerOnChange={changeHeader}
+            textOfNoteOnChange={changeTextOfNote}
           />
-          <CloseNoteButton closeThisNote={() => closeThisNote(index)} />
+          {marksOfNotes}
+          <button onClick={showMarksField}>Marks</button>
+          <CloseNoteButton closeThisNote={closeThisNote} />
         </div>
       )
     );
@@ -156,6 +173,11 @@ export default function NotesField(): JSX.Element {
         </div>
       );
     case "creating":
+      const marksOfNotes = appData.notesStore[
+        appData.notesStore.length - 1
+      ].marks.map((mark) => {
+        return <div key={mark}>{mark}</div>;
+      });
       return (
         <div>
           <DeleteNoteButton deleteThisNote={deleteCreatingNote} />
@@ -169,11 +191,22 @@ export default function NotesField(): JSX.Element {
             }
             textOfNoteOnChange={addTextOfNote}
           />
+          <div>{marksOfNotes}</div>
+          <button onClick={showMarksField}>Marks</button>
           <button onClick={closeNote}>Close Note</button>
         </div>
       );
     case "open":
       return <div>{openedNote}</div>;
+    case "add mark":
+      return (
+        <div>
+          <div>
+            <button onClick={returnFromMarks}>Return to note</button>
+          </div>
+          <MarksField markClicked={addMarkInsideNote} />
+        </div>
+      );
     default:
       return (
         <div>

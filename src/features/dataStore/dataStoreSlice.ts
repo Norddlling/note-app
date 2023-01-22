@@ -4,26 +4,30 @@ import type { RootState } from "../../app/store";
 interface NoteTemplate {
   header: string;
   textOfNote: string;
-  marks?: string[];
+  marks: string[];
   opened: boolean;
 }
 
 type StoreTypes = {
   notesStore: NoteTemplate[];
+  noteIndex: number;
   noteStatus: string;
+  noteStatusHolder: string;
   marksStore: string[];
+  clickedMark: string;
   searchMark: string;
   openNote: boolean;
-  changedText: string;
 };
 
 const initialState: StoreTypes = {
   notesStore: [],
+  noteIndex: 0,
   noteStatus: "show all",
+  noteStatusHolder: "",
   marksStore: [],
+  clickedMark: "",
   searchMark: "",
-  openNote: false,
-  changedText: ""
+  openNote: false
 };
 
 export const dataStoreSlice = createSlice({
@@ -33,11 +37,11 @@ export const dataStoreSlice = createSlice({
     switchNoteStatus: (state, action: PayloadAction<string>) => {
       state.noteStatus = action.payload;
     },
-    openStoredNote: (state, action: PayloadAction<number>) => {
-      state.notesStore[action.payload].opened = true;
+    openStoredNote: (state) => {
+      state.notesStore[state.noteIndex].opened = true;
     },
-    closeStoredNote: (state, action: PayloadAction<number>) => {
-      state.notesStore[action.payload].opened = false;
+    closeStoredNote: (state) => {
+      state.notesStore[state.noteIndex].opened = false;
     },
     addNote: (state, action: PayloadAction<NoteTemplate>) => {
       state.notesStore.push(action.payload);
@@ -48,29 +52,53 @@ export const dataStoreSlice = createSlice({
     createNoteTextOfNote: (state, action: PayloadAction<string>) => {
       state.notesStore[state.notesStore.length - 1].textOfNote = action.payload;
     },
-    changeHeaderValue: (state, action: PayloadAction<string>) => {
-      state.changedText = action.payload;
+    saveNoteIndex: (state, action: PayloadAction<number>) => {
+      state.noteIndex = action.payload;
     },
-    changeHeaderIndex: (state, action: PayloadAction<number>) => {
-      state.notesStore[action.payload].header = state.changedText;
+    changeHeaderValue: (state, action: PayloadAction<string>) => {
+      state.notesStore[state.noteIndex].header = action.payload;
     },
     changeTextOfNoteValue: (state, action: PayloadAction<string>) => {
-      state.changedText = action.payload;
-    },
-    changeTextOfNoteIndex: (state, action: PayloadAction<number>) => {
-      state.notesStore[action.payload].textOfNote = state.changedText;
+      state.notesStore[state.noteIndex].textOfNote = action.payload;
     },
     deleteEmptyNote: (state) => {
       state.notesStore.pop();
     },
-    deleteExistingNote: (state, action: PayloadAction<number>) => {
-      state.notesStore.splice(action.payload, 1);
+    deleteExistingNote: (state) => {
+      state.notesStore.splice(state.noteIndex, 1);
     },
     markSearchbarUpdate: (state, action: PayloadAction<string>) => {
       state.searchMark = action.payload;
     },
-    outsideNoteAddMark: (state, action: PayloadAction<string>) => {
+    addNewMark: (state, action: PayloadAction<string>) => {
       state.marksStore.push(action.payload);
+    },
+    deleteMark: (state, action: PayloadAction<number>) => {
+      state.marksStore.splice(action.payload, 1);
+    },
+    saveNoteStatus: (state) => {
+      state.noteStatusHolder = state.noteStatus;
+    },
+    holdMark: (state, action: PayloadAction<number>) => {
+      state.clickedMark = state.marksStore[action.payload];
+    },
+    addMarkCreatedNote: (state) => {
+      if (
+        !state.notesStore[state.notesStore.length - 1].marks.includes(
+          state.clickedMark
+        )
+      ) {
+        state.notesStore[state.notesStore.length - 1].marks.push(
+          state.clickedMark
+        );
+      }
+    },
+    addMarkOpenedNote: (state) => {
+      if (
+        !state.notesStore[state.noteIndex].marks.includes(state.clickedMark)
+      ) {
+        state.notesStore[state.noteIndex].marks.push(state.clickedMark);
+      }
     }
   }
 });
@@ -82,14 +110,18 @@ export const {
   closeStoredNote,
   createNoteHeader,
   createNoteTextOfNote,
+  saveNoteIndex,
   changeHeaderValue,
-  changeHeaderIndex,
   changeTextOfNoteValue,
-  changeTextOfNoteIndex,
   deleteEmptyNote,
   deleteExistingNote,
   markSearchbarUpdate,
-  outsideNoteAddMark
+  addNewMark,
+  deleteMark,
+  saveNoteStatus,
+  holdMark,
+  addMarkCreatedNote,
+  addMarkOpenedNote
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;

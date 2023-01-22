@@ -3,36 +3,67 @@ import Mark from "./Mark";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
-  outsideNoteAddMark,
-  markSearchbarUpdate
+  markSearchbarUpdate,
+  addNewMark,
+  deleteMark,
+  holdMark
 } from "../features/dataStore/dataStoreSlice";
 
-export default function MarksField(): JSX.Element {
+interface MatksFieldProps {
+  markClicked: React.MouseEventHandler<HTMLDivElement>;
+}
+
+export default function MarksField(props: MatksFieldProps): JSX.Element {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
+
+  function findMarkValue(event: React.ChangeEvent<HTMLInputElement>) {
+    return dispatch(markSearchbarUpdate(event.target.value));
+  }
+
+  function deleteThisMark(index: number) {
+    return dispatch(deleteMark(index));
+  }
+
+  function addMark() {
+    if (appData.searchMark !== "") {
+      return (
+        dispatch(addNewMark(appData.searchMark)),
+        dispatch(markSearchbarUpdate(""))
+      );
+    }
+  }
+
+  function saveMark(index: number) {
+    return dispatch(holdMark(index));
+  }
 
   const MarksValues = appData.marksStore.map((mark, index) => {
     return (
       mark.includes(appData.searchMark) && (
-        <div key={mark}>
-          <Mark mark={mark} />
+        <div key={mark} onClick={props.markClicked}>
+          <Mark
+            mark={mark}
+            deleteMark={() => deleteThisMark(index)}
+            clickOnMark={() => saveMark(index)}
+          />
         </div>
       )
     );
   });
 
-  function addMark(event: React.ChangeEvent<HTMLInputElement>) {
-    return dispatch(markSearchbarUpdate(event.target.value));
-  }
-
   return (
     <div>
       <div>
-        <input type="text" value={appData.searchMark} onChange={addMark} />
+        <input
+          type="text"
+          value={appData.searchMark}
+          onChange={findMarkValue}
+        />
       </div>
       <div>{MarksValues}</div>
       <div>
-        <button>Add new mark</button>
+        <button onClick={addMark}>Add new mark</button>
       </div>
     </div>
   );

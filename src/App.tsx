@@ -1,12 +1,12 @@
 import React from "react";
 import "./styles.css";
 import NotesField from "./notes/NotesField";
-import MarksField from "./notes/MarksField";
+import MarksFieldOutsideNote from "./notes/MarksFieldOutsideNote";
 
 export default function App() {
   return (
     <main>
-      <MarksField />
+      <MarksFieldOutsideNote />
       <NotesField />
     </main>
   );

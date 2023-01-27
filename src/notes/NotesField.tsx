@@ -66,7 +66,7 @@ export default function NotesField(): JSX.Element {
   }
 
   function openThisNote() {
-    return dispatch(openStoredNote()), dispatch(switchNoteStatus("open"));
+    return (dispatch(openStoredNote()), dispatch(switchNoteStatus("open")));
   }
 
   function closeThisNote() {
@@ -94,11 +94,11 @@ export default function NotesField(): JSX.Element {
   }
 
   function deleteCreatingNote() {
-    return dispatch(deleteEmptyNote()), dispatch(switchNoteStatus("show all"));
+    return (dispatch(deleteEmptyNote()), dispatch(switchNoteStatus("show all")));
   }
 
   function showMarksField() {
-    return dispatch(saveNoteStatus()), dispatch(switchNoteStatus("add mark"));
+    return (dispatch(saveNoteStatus()), dispatch(switchNoteStatus("add mark")));
   }
 
   function returnFromMarks() {

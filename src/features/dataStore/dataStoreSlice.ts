@@ -76,6 +76,12 @@ export const dataStoreSlice = createSlice({
     deleteMark: (state, action: PayloadAction<number>) => {
       state.marksStore.splice(action.payload, 1);
     },
+    removeMarkFromNote: (state) => {
+      let deletedFromNoteMark = state.notesStore[state.noteIndex].marks.indexOf(
+        state.clickedMark
+      );
+      state.notesStore[state.noteIndex].marks.splice(deletedFromNoteMark, 1);
+    },
     saveNoteStatus: (state) => {
       state.noteStatusHolder = state.noteStatus;
     },
@@ -118,6 +124,7 @@ export const {
   markSearchbarUpdate,
   addNewMark,
   deleteMark,
+  removeMarkFromNote,
   saveNoteStatus,
   holdMark,
   addMarkCreatedNote,
@@ -125,3 +132,4 @@ export const {
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;
+

@@ -6,6 +6,7 @@ import {
   markSearchbarUpdate,
   addNewMark,
   deleteMark,
+  removeMarkFromNote,
   holdMark
 } from "../features/dataStore/dataStoreSlice";
 
@@ -22,7 +23,11 @@ export default function MarksField(props: MatksFieldProps): JSX.Element {
   }
 
   function deleteThisMark(index: number) {
-    return dispatch(deleteMark(index));
+    return (
+      dispatch(holdMark(index)),
+      dispatch(removeMarkFromNote()),
+      dispatch(deleteMark(index))
+    );
   }
 
   function addMark() {
@@ -41,9 +46,10 @@ export default function MarksField(props: MatksFieldProps): JSX.Element {
   const MarksValues = appData.marksStore.map((mark, index) => {
     return (
       mark.includes(appData.searchMark) && (
-        <div key={mark} onClick={props.markClicked}>
+        <div key={mark}>
           <Mark
             mark={mark}
+            markClicked={props.markClicked}
             deleteMark={() => deleteThisMark(index)}
             clickOnMark={() => saveMark(index)}
           />

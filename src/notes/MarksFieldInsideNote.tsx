@@ -5,18 +5,29 @@ import {
   dataStore,
   markSearchbarUpdate,
   addNewMark,
+  addNewMarkName,
   deleteMark,
+  deleteMarkName,
   removeMarkFromNote,
-  holdMark
+  removeMarkNameFromNote,
+  holdMark,
+  saveMarkIndex
 } from "../features/dataStore/dataStoreSlice";
 
 interface MatksFieldProps {
   markClicked: React.MouseEventHandler<HTMLDivElement>;
+  //noteStatus: string;
 }
 
-export default function MarksField(props: MatksFieldProps): JSX.Element {
+export default function MarksFieldInsideNote(
+  props: MatksFieldProps
+): JSX.Element {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
+
+  interface MarkInputProps {
+    mark: string;
+  }
 
   function findMarkValue(event: React.ChangeEvent<HTMLInputElement>) {
     return dispatch(markSearchbarUpdate(event.target.value));
@@ -24,32 +35,58 @@ export default function MarksField(props: MatksFieldProps): JSX.Element {
 
   function deleteThisMark(index: number) {
     return (
-      dispatch(holdMark(index)),
+      dispatch(saveMarkIndex(index)),
+      dispatch(holdMark()),
       dispatch(removeMarkFromNote()),
-      dispatch(deleteMark(index))
+      dispatch(removeMarkNameFromNote()),
+      dispatch(deleteMark()),
+      dispatch(deleteMarkName())
     );
   }
 
   function addMark() {
     if (appData.searchMark !== "") {
       return (
-        dispatch(addNewMark(appData.searchMark)),
+        dispatch(
+          addNewMark({
+            markName: appData.searchMark,
+            selectedOutsideNote: false,
+            selectedInsideNote: false
+          })
+        ),
+        dispatch(addNewMarkName(appData.searchMark)),
         dispatch(markSearchbarUpdate(""))
       );
     }
   }
 
   function saveMark(index: number) {
-    return dispatch(holdMark(index));
+    return dispatch(saveMarkIndex(index)), dispatch(holdMark());
+  }
+
+  function MarkInput(props: MarkInputProps) {
+    return appData.notesStore[appData.noteIndex] !== undefined &&
+      appData.notesStore[appData.noteIndex].marksNames.includes(props.mark) ? (
+      <input
+        type="checkbox"
+        id={props.mark}
+        name="marks"
+        value={props.mark}
+        checked
+      />
+    ) : (
+      <input type="checkbox" id={props.mark} name="marks" value={props.mark} />
+    );
   }
 
   const MarksValues = appData.marksStore.map((mark, index) => {
     return (
-      mark.includes(appData.searchMark) && (
-        <div key={mark}>
+      mark.markName.includes(appData.searchMark) && (
+        <div key={mark.markName}>
           <Mark
-            mark={mark}
+            mark={mark.markName}
             markClicked={props.markClicked}
+            markInput={<MarkInput mark={mark.markName} />}
             deleteMark={() => deleteThisMark(index)}
             clickOnMark={() => saveMark(index)}
           />

@@ -20,7 +20,6 @@ import {
   dataStore,
   saveNoteStatus,
   addMarkInsideNote,
-  addMarkNameInsideNote,
   NoteTemplate
 } from "../features/dataStore/dataStoreSlice";
 
@@ -35,7 +34,6 @@ export default function NotesField(): JSX.Element {
           header: "",
           textOfNote: "",
           marks: [],
-          marksNames: [],
           opened: false
         })
       ),
@@ -117,18 +115,17 @@ export default function NotesField(): JSX.Element {
   }
 
   function addMarkInNote() {
-    return dispatch(addMarkInsideNote()), dispatch(addMarkNameInsideNote());
+    return dispatch(addMarkInsideNote());
   }
 
   const marksValues = (note: NoteTemplate) => {
     return note.marks.map((mark) => {
-      return <div key={mark.markName}>{mark.markName}</div>;
+      return <div key={mark}>{mark}</div>;
     });
   };
 
   const createdNotes = appData.notesStore.map((note, index) => {
     const marksOfNotes = marksValues(note);
-
     return (
       <div key={index}>
         <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
@@ -150,6 +147,34 @@ export default function NotesField(): JSX.Element {
           )}
         </div>
       </div>
+    );
+  });
+
+  const filteredNotes = appData.notesStore.map((note, index) => {
+    const marksOfNotes = marksValues(note);
+    return (
+      note.marks.includes(appData.marksStore[appData.markIndex]) && (
+        <div key={index}>
+          <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
+          <div onClick={openThisNote} onKeyPress={openThisNote}>
+            <div
+              onClick={() => rememberOpenedNote(index)}
+              onKeyPress={() => rememberOpenedNote(index)}
+            >
+              <Note
+                headerValue={note.header}
+                textOfNoteValue={note.textOfNote}
+                headerOnChange={changeHeader}
+                textOfNoteOnChange={changeTextOfNote}
+              />
+              {marksOfNotes}
+            </div>
+            {appData.notesStore[index].opened && (
+              <CloseNoteButton closeThisNote={closeThisNote} />
+            )}
+          </div>
+        </div>
+      )
     );
   });
 
@@ -186,7 +211,7 @@ export default function NotesField(): JSX.Element {
       const marksOfNotes = appData.notesStore[
         appData.notesStore.length - 1
       ].marks.map((mark) => {
-        return <div key={mark.markName}>{mark.markName}</div>;
+        return <div key={mark}>{mark}</div>;
       });
       return (
         <div>
@@ -214,12 +239,11 @@ export default function NotesField(): JSX.Element {
           <div>
             <button onClick={returnFromMarks}>Return to note</button>
           </div>
-          <MarksFieldInsideNote
-            markClicked={addMarkInNote}
-            //noteStatus={appData.noteStatus}
-          />
+          <MarksFieldInsideNote markClicked={addMarkInNote} />
         </div>
       );
+    case "filtered by marks":
+      return <div>{filteredNotes}</div>;
     default:
       return (
         <div>

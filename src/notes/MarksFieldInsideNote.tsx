@@ -5,18 +5,15 @@ import {
   dataStore,
   markSearchbarUpdate,
   addNewMark,
-  addNewMarkName,
   deleteMark,
-  deleteMarkName,
   removeMarkFromNote,
-  removeMarkNameFromNote,
+  removeMarkFromAllNotes,
   holdMark,
   saveMarkIndex
 } from "../features/dataStore/dataStoreSlice";
 
 interface MatksFieldProps {
   markClicked: React.MouseEventHandler<HTMLDivElement>;
-  //noteStatus: string;
 }
 
 export default function MarksFieldInsideNote(
@@ -38,23 +35,15 @@ export default function MarksFieldInsideNote(
       dispatch(saveMarkIndex(index)),
       dispatch(holdMark()),
       dispatch(removeMarkFromNote()),
-      dispatch(removeMarkNameFromNote()),
-      dispatch(deleteMark()),
-      dispatch(deleteMarkName())
+      dispatch(removeMarkFromAllNotes()),
+      dispatch(deleteMark())
     );
   }
 
   function addMark() {
     if (appData.searchMark !== "") {
       return (
-        dispatch(
-          addNewMark({
-            markName: appData.searchMark,
-            selectedOutsideNote: false,
-            selectedInsideNote: false
-          })
-        ),
-        dispatch(addNewMarkName(appData.searchMark)),
+        dispatch(addNewMark(appData.searchMark)),
         dispatch(markSearchbarUpdate(""))
       );
     }
@@ -66,7 +55,7 @@ export default function MarksFieldInsideNote(
 
   function MarkInput(props: MarkInputProps) {
     return appData.notesStore[appData.noteIndex] !== undefined &&
-      appData.notesStore[appData.noteIndex].marksNames.includes(props.mark) ? (
+      appData.notesStore[appData.noteIndex].marks.includes(props.mark) ? (
       <input
         type="checkbox"
         id={props.mark}
@@ -81,12 +70,12 @@ export default function MarksFieldInsideNote(
 
   const MarksValues = appData.marksStore.map((mark, index) => {
     return (
-      mark.markName.includes(appData.searchMark) && (
-        <div key={mark.markName}>
+      mark.includes(appData.searchMark) && (
+        <div key={mark}>
           <Mark
-            mark={mark.markName}
+            mark={mark}
             markClicked={props.markClicked}
-            markInput={<MarkInput mark={mark.markName} />}
+            markInput={<MarkInput mark={mark} />}
             deleteMark={() => deleteThisMark(index)}
             clickOnMark={() => saveMark(index)}
           />

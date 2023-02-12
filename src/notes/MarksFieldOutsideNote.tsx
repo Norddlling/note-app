@@ -3,13 +3,11 @@ import Mark from "./Mark";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
+  switchNoteStatus,
   markSearchbarUpdate,
   addNewMark,
-  addNewMarkName,
   deleteMark,
-  deleteMarkName,
-  removeMarkFromNote,
-  removeMarkNameFromNote,
+  removeMarkFromAllNotes,
   holdMark,
   saveMarkIndex
 } from "../features/dataStore/dataStoreSlice";
@@ -29,22 +27,16 @@ export default function MarksFieldOutsideNote(): JSX.Element {
   function deleteThisMark(index: number) {
     return (
       dispatch(saveMarkIndex(index)),
-      dispatch(deleteMark()),
-      dispatch(deleteMarkName())
+      dispatch(holdMark()),
+      dispatch(removeMarkFromAllNotes()),
+      dispatch(deleteMark())
     );
   }
 
   function addMark() {
     if (appData.searchMark !== "") {
       return (
-        dispatch(
-          addNewMark({
-            markName: appData.searchMark,
-            selectedOutsideNote: false,
-            selectedInsideNote: false
-          })
-        ),
-        dispatch(addNewMarkName(appData.searchMark)),
+        dispatch(addNewMark(appData.searchMark)),
         dispatch(markSearchbarUpdate(""))
       );
     }
@@ -54,22 +46,35 @@ export default function MarksFieldOutsideNote(): JSX.Element {
     return dispatch(saveMarkIndex(index));
   }
 
+  function filterByMarks() {
+    return dispatch(switchNoteStatus("filtered by marks"));
+  }
+
+  function resetMarksFilter() {
+    return dispatch(switchNoteStatus("show all"));
+  }
+
   function MarkInput(props: MarkInputProps) {
     return (
       <div>
-        <input type="radio" id={props.mark} name="test" value={props.mark} />
+        <input
+          type="radio"
+          id={props.mark}
+          name="filterMark"
+          value={props.mark}
+        />
       </div>
     );
   }
 
   const MarksValues = appData.marksStore.map((mark, index) => {
     return (
-      mark.markName.includes(appData.searchMark) && (
-        <div key={mark.markName}>
+      mark.includes(appData.searchMark) && (
+        <div key={mark}>
           <Mark
-            mark={mark.markName}
-            //markClicked={() => appData.noteStatus}
-            markInput={<MarkInput mark={mark.markName} />}
+            mark={mark}
+            markClicked={filterByMarks}
+            markInput={<MarkInput mark={mark} />}
             deleteMark={() => deleteThisMark(index)}
             clickOnMark={() => saveMark(index)}
           />
@@ -80,7 +85,8 @@ export default function MarksFieldOutsideNote(): JSX.Element {
 
   return (
     <div>
-      {appData.noteStatus === "show all" && (
+      {(appData.noteStatus === "show all" ||
+        appData.noteStatus === "filtered by marks") && (
         <div>
           <div>
             <input
@@ -89,6 +95,12 @@ export default function MarksFieldOutsideNote(): JSX.Element {
               onChange={findMarkValue}
             />
           </div>
+          <button onClick={resetMarksFilter}>
+            <label>
+              <input type="radio" name="filterMark" value="Show all" />
+              <span>Show all</span>
+            </label>
+          </button>
           <div>{MarksValues}</div>
           <div>
             <button onClick={addMark}>Add new mark</button>

@@ -6,6 +6,8 @@ interface NoteTemplate {
   textOfNote: string;
   marks: string[];
   opened: boolean;
+  listMode: boolean;
+  listModeTextOfNote: string[];
 }
 
 type StoreTypes = {
@@ -17,7 +19,7 @@ type StoreTypes = {
   markIndex: number;
   clickedMark: string;
   searchMark: string;
-  openNote: boolean;
+  listTextOfNoteIndex: number;
 };
 
 const initialState: StoreTypes = {
@@ -29,7 +31,7 @@ const initialState: StoreTypes = {
   markIndex: 0,
   clickedMark: "",
   searchMark: "",
-  openNote: false
+  listTextOfNoteIndex: 0
 };
 
 export const dataStoreSlice = createSlice({
@@ -125,6 +127,30 @@ export const dataStoreSlice = createSlice({
           1
         );
       }
+    },
+    switchListMode: (state) => {
+      state.notesStore[state.noteIndex].listMode = !state.notesStore[
+        state.noteIndex
+      ].listMode;
+    },
+    saveListTextOfNoteIndex: (state, action: PayloadAction<number>) => {
+      state.listTextOfNoteIndex = action.payload;
+    },
+    showListInNote: (state) => {
+      if (state.notesStore[state.noteIndex].listMode) {
+        state.notesStore[state.noteIndex].listModeTextOfNote = state.notesStore[
+          state.noteIndex
+        ].textOfNote.split(/\n/);
+      } else {
+        state.notesStore[state.noteIndex].textOfNote = state.notesStore[
+          state.noteIndex
+        ].listModeTextOfNote.join(`\n`);
+      }
+    },
+    changeListTextOfNote: (state, action: PayloadAction<string>) => {
+      state.notesStore[state.noteIndex].listModeTextOfNote[
+        state.listTextOfNoteIndex
+      ] = action.payload;
     }
   }
 });
@@ -150,7 +176,11 @@ export const {
   holdMark,
   saveMarkIndex,
   creatingNoteIndex,
-  addMarkInsideNote
+  addMarkInsideNote,
+  switchListMode,
+  saveListTextOfNoteIndex,
+  showListInNote,
+  changeListTextOfNote
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;

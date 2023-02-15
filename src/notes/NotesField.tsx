@@ -1,5 +1,7 @@
 import React from "react";
 import Note from "./Note";
+import ListModeNote from "./ListModeNote";
+import ListedNoteClosed from "./ListedNoteClosed";
 import CloseNoteButton from "./CloseNoteButton";
 import DeleteNoteButton from "./DeleteNoteButton";
 import MarksFieldInsideNote from "./MarksFieldInsideNote";
@@ -20,6 +22,8 @@ import {
   dataStore,
   saveNoteStatus,
   addMarkInsideNote,
+  switchListMode,
+  showListInNote,
   NoteTemplate
 } from "../features/dataStore/dataStoreSlice";
 
@@ -34,7 +38,9 @@ export default function NotesField(): JSX.Element {
           header: "",
           textOfNote: "",
           marks: [],
-          opened: false
+          opened: false,
+          listMode: false,
+          listModeTextOfNote: []
         })
       ),
       dispatch(creatingNoteIndex()),
@@ -118,6 +124,10 @@ export default function NotesField(): JSX.Element {
     return dispatch(addMarkInsideNote());
   }
 
+  function changeListMode() {
+    return dispatch(switchListMode()), dispatch(showListInNote());
+  }
+
   const marksValues = (note: NoteTemplate) => {
     return note.marks.map((mark) => {
       return <div key={mark}>{mark}</div>;
@@ -126,6 +136,7 @@ export default function NotesField(): JSX.Element {
 
   const createdNotes = appData.notesStore.map((note, index) => {
     const marksOfNotes = marksValues(note);
+
     return (
       <div key={index}>
         <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
@@ -134,12 +145,19 @@ export default function NotesField(): JSX.Element {
             onClick={() => rememberOpenedNote(index)}
             onKeyPress={() => rememberOpenedNote(index)}
           >
-            <Note
-              headerValue={note.header}
-              textOfNoteValue={note.textOfNote}
-              headerOnChange={changeHeader}
-              textOfNoteOnChange={changeTextOfNote}
-            />
+            {note.listMode ? (
+              <ListedNoteClosed
+                listModeTextOfNote={note.listModeTextOfNote}
+                noteHeader={note.header}
+              />
+            ) : (
+              <Note
+                headerValue={note.header}
+                textOfNoteValue={note.textOfNote}
+                headerOnChange={changeHeader}
+                textOfNoteOnChange={changeTextOfNote}
+              />
+            )}
             {marksOfNotes}
           </div>
           {appData.notesStore[index].opened && (
@@ -147,6 +165,35 @@ export default function NotesField(): JSX.Element {
           )}
         </div>
       </div>
+    );
+  });
+
+  const openedNote = appData.notesStore.map((note, index) => {
+    const marksOfNotes = marksValues(note);
+
+    return (
+      note.opened === true && (
+        <div key={index}>
+          <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
+          {appData.notesStore[appData.noteIndex].listMode ? (
+            <ListModeNote
+              headerValue={note.header}
+              headerOnChange={changeHeader}
+            />
+          ) : (
+            <Note
+              headerValue={note.header}
+              textOfNoteValue={note.textOfNote}
+              headerOnChange={changeHeader}
+              textOfNoteOnChange={changeTextOfNote}
+            />
+          )}
+          <button onClick={changeListMode}>List</button>
+          {marksOfNotes}
+          <button onClick={showMarksField}>Marks</button>
+          <CloseNoteButton closeThisNote={closeThisNote} />
+        </div>
+      )
     );
   });
 
@@ -173,27 +220,6 @@ export default function NotesField(): JSX.Element {
               <CloseNoteButton closeThisNote={closeThisNote} />
             )}
           </div>
-        </div>
-      )
-    );
-  });
-
-  const openedNote = appData.notesStore.map((note, index) => {
-    const marksOfNotes = marksValues(note);
-
-    return (
-      note.opened === true && (
-        <div key={index}>
-          <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
-          <Note
-            headerValue={note.header}
-            textOfNoteValue={note.textOfNote}
-            headerOnChange={changeHeader}
-            textOfNoteOnChange={changeTextOfNote}
-          />
-          {marksOfNotes}
-          <button onClick={showMarksField}>Marks</button>
-          <CloseNoteButton closeThisNote={closeThisNote} />
         </div>
       )
     );

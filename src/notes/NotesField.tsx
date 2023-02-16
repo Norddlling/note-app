@@ -5,6 +5,7 @@ import ListedNoteClosed from "./ListedNoteClosed";
 import CloseNoteButton from "./CloseNoteButton";
 import DeleteNoteButton from "./DeleteNoteButton";
 import MarksFieldInsideNote from "./MarksFieldInsideNote";
+import NoteSearchField from "./NoteSearchField";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   addNote,
@@ -138,32 +139,40 @@ export default function NotesField(): JSX.Element {
     const marksOfNotes = marksValues(note);
 
     return (
-      <div key={index}>
-        <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
-        <div onClick={openThisNote} onKeyPress={openThisNote}>
-          <div
-            onClick={() => rememberOpenedNote(index)}
-            onKeyPress={() => rememberOpenedNote(index)}
-          >
-            {note.listMode ? (
-              <ListedNoteClosed
-                listModeTextOfNote={note.listModeTextOfNote}
-                noteHeader={note.header}
-              />
-            ) : (
-              <Note
-                headerValue={note.header}
-                textOfNoteValue={note.textOfNote}
-                headerOnChange={changeHeader}
-                textOfNoteOnChange={changeTextOfNote}
-              />
-            )}
-            {marksOfNotes}
+      <div>
+        {(note.header.includes(appData.searchNote) ||
+          note.textOfNote.includes(appData.searchNote) ||
+          note.listModeTextOfNote.includes(appData.searchNote)) && (
+          <div key={index}>
+            <DeleteNoteButton
+              deleteThisNote={() => deleteSelectedNote(index)}
+            />
+            <div onClick={openThisNote} onKeyPress={openThisNote}>
+              <div
+                onClick={() => rememberOpenedNote(index)}
+                onKeyPress={() => rememberOpenedNote(index)}
+              >
+                {note.listMode ? (
+                  <ListedNoteClosed
+                    listModeTextOfNote={note.listModeTextOfNote}
+                    noteHeader={note.header}
+                  />
+                ) : (
+                  <Note
+                    headerValue={note.header}
+                    textOfNoteValue={note.textOfNote}
+                    headerOnChange={changeHeader}
+                    textOfNoteOnChange={changeTextOfNote}
+                  />
+                )}
+                {marksOfNotes}
+              </div>
+              {appData.notesStore[index].opened && (
+                <CloseNoteButton closeThisNote={closeThisNote} />
+              )}
+            </div>
           </div>
-          {appData.notesStore[index].opened && (
-            <CloseNoteButton closeThisNote={closeThisNote} />
-          )}
-        </div>
+        )}
       </div>
     );
   });
@@ -201,25 +210,33 @@ export default function NotesField(): JSX.Element {
     const marksOfNotes = marksValues(note);
     return (
       note.marks.includes(appData.marksStore[appData.markIndex]) && (
-        <div key={index}>
-          <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
-          <div onClick={openThisNote} onKeyPress={openThisNote}>
-            <div
-              onClick={() => rememberOpenedNote(index)}
-              onKeyPress={() => rememberOpenedNote(index)}
-            >
-              <Note
-                headerValue={note.header}
-                textOfNoteValue={note.textOfNote}
-                headerOnChange={changeHeader}
-                textOfNoteOnChange={changeTextOfNote}
+        <div>
+          {(note.header.includes(appData.searchNote) ||
+            note.textOfNote.includes(appData.searchNote) ||
+            note.listModeTextOfNote.includes(appData.searchNote)) && (
+            <div key={index}>
+              <DeleteNoteButton
+                deleteThisNote={() => deleteSelectedNote(index)}
               />
-              {marksOfNotes}
+              <div onClick={openThisNote} onKeyPress={openThisNote}>
+                <div
+                  onClick={() => rememberOpenedNote(index)}
+                  onKeyPress={() => rememberOpenedNote(index)}
+                >
+                  <Note
+                    headerValue={note.header}
+                    textOfNoteValue={note.textOfNote}
+                    headerOnChange={changeHeader}
+                    textOfNoteOnChange={changeTextOfNote}
+                  />
+                  {marksOfNotes}
+                </div>
+                {appData.notesStore[index].opened && (
+                  <CloseNoteButton closeThisNote={closeThisNote} />
+                )}
+              </div>
             </div>
-            {appData.notesStore[index].opened && (
-              <CloseNoteButton closeThisNote={closeThisNote} />
-            )}
-          </div>
+          )}
         </div>
       )
     );
@@ -229,6 +246,7 @@ export default function NotesField(): JSX.Element {
     case "show all":
       return (
         <div>
+          <NoteSearchField />
           <button onClick={createNewNote}>Create Note</button>
           {createdNotes}
         </div>
@@ -269,10 +287,16 @@ export default function NotesField(): JSX.Element {
         </div>
       );
     case "filtered by marks":
-      return <div>{filteredNotes}</div>;
+      return (
+        <div>
+          <NoteSearchField />
+          {filteredNotes}
+        </div>
+      );
     default:
       return (
         <div>
+          <NoteSearchField />
           <button onClick={createNewNote}>Create Note</button>
           {createdNotes}
         </div>

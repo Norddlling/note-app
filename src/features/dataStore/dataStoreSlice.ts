@@ -20,6 +20,7 @@ type StoreTypes = {
   clickedMark: string;
   searchMark: string;
   listTextOfNoteIndex: number;
+  searchNote: string;
 };
 
 const initialState: StoreTypes = {
@@ -31,7 +32,8 @@ const initialState: StoreTypes = {
   markIndex: 0,
   clickedMark: "",
   searchMark: "",
-  listTextOfNoteIndex: 0
+  listTextOfNoteIndex: 0,
+  searchNote: ""
 };
 
 export const dataStoreSlice = createSlice({
@@ -151,7 +153,10 @@ export const dataStoreSlice = createSlice({
       state.notesStore[state.noteIndex].listModeTextOfNote[
         state.listTextOfNoteIndex
       ] = action.payload;
-    }
+    },
+    searchedNoteText: (state, action: PayloadAction<string>) => {
+      state.searchNote = action.payload;
+    },
   }
 });
 
@@ -180,7 +185,8 @@ export const {
   switchListMode,
   saveListTextOfNoteIndex,
   showListInNote,
-  changeListTextOfNote
+  changeListTextOfNote,
+  searchedNoteText
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;

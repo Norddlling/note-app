@@ -7,7 +7,7 @@ interface NoteProps {
   textOfNoteOnChange: React.ChangeEventHandler<HTMLTextAreaElement>;
 }
 
-export default function Note(props: NoteProps) {
+export default function EditableNote(props: NoteProps) {
   return (
     <div>
       <div>

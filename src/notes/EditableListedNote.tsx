@@ -6,12 +6,12 @@ import {
   changeListTextOfNote
 } from "../features/dataStore/dataStoreSlice";
 
-interface ListModeNoteProps {
+interface EditableListedNoteProps {
   headerValue: string;
   headerOnChange: React.ChangeEventHandler<HTMLTextAreaElement>;
 }
 
-export default function ListModeNote(props: ListModeNoteProps) {
+export default function EditableListedNote(props: EditableListedNoteProps) {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
 

@@ -13,7 +13,7 @@ export default function Mark(props: MarkProps): JSX.Element {
     <div>
       <div onClick={props.markClicked}>
         <button onClick={props.clickOnMark}>
-          <label for={props.mark}>
+          <label>
             {props.markInput}
             <p>{props.mark}</p>
           </label>

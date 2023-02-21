@@ -97,7 +97,12 @@ export default function MarksFieldOutsideNote(): JSX.Element {
           </div>
           <button onClick={resetMarksFilter}>
             <label>
-              <input type="radio" name="filterMark" value="Show all" />
+              <input
+                type="radio"
+                name="filterMark"
+                value="Show all"
+                defaultChecked
+              />
               <span>Show all</span>
             </label>
           </button>

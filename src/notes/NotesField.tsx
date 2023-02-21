@@ -1,7 +1,8 @@
 import React from "react";
-import Note from "./Note";
-import ListModeNote from "./ListModeNote";
-import ListedNoteClosed from "./ListedNoteClosed";
+import EditableNote from "./EditableNote";
+import NotEditableNote from "./NotEditableNote";
+import EditableListedNote from "./EditableListedNote";
+import NotEditableListedNote from "./NotEditableListedNote";
 import CloseNoteButton from "./CloseNoteButton";
 import DeleteNoteButton from "./DeleteNoteButton";
 import MarksFieldInsideNote from "./MarksFieldInsideNote";
@@ -135,15 +136,112 @@ export default function NotesField(): JSX.Element {
     });
   };
 
+  const highlitedHeader = (note: NoteTemplate) => {
+    return note.header
+      .toLowerCase()
+      .includes(appData.searchNote.toLowerCase()) &&
+      appData.searchNote !== "" ? (
+      <p>
+        <span>
+          {note.header
+            .toLowerCase()
+            .slice(0, note.header.indexOf(appData.searchNote.toLowerCase()))}
+        </span>
+        <mark>{appData.searchNote}</mark>
+        <span>
+          {note.header
+            .toLowerCase()
+            .slice(
+              note.header.indexOf(appData.searchNote.toLowerCase()) +
+                appData.searchNote.length
+            )}
+        </span>
+      </p>
+    ) : (
+      <p>{note.header}</p>
+    );
+  };
+
+  const highlitedTextOfNote = (note: NoteTemplate) => {
+    return note.textOfNote
+      .toLowerCase()
+      .includes(appData.searchNote.toLowerCase()) &&
+      appData.searchNote !== "" ? (
+      <p>
+        <span>
+          {note.textOfNote
+            .toLowerCase()
+            .slice(
+              0,
+              note.textOfNote.indexOf(appData.searchNote.toLowerCase())
+            )}
+        </span>
+        <mark>{appData.searchNote}</mark>
+        <span>
+          {note.textOfNote.slice(
+            note.textOfNote
+              .toLowerCase()
+              .indexOf(appData.searchNote.toLowerCase()) +
+              appData.searchNote.length
+          )}
+        </span>
+      </p>
+    ) : (
+      <p>{note.textOfNote}</p>
+    );
+  };
+
+  const highlitedListModeTextOfNote = (note: NoteTemplate) => {
+    return note.listModeTextOfNote.map((paragraph) => {
+      return (
+        <div key={paragraph}>
+          {paragraph.toLowerCase().includes(appData.searchNote.toLowerCase()) &&
+          appData.searchNote !== "" ? (
+            <p>
+              <span>
+                {paragraph
+                  .toLowerCase()
+                  .slice(
+                    0,
+                    paragraph.indexOf(appData.searchNote.toLowerCase())
+                  )}
+              </span>
+              <mark>{appData.searchNote}</mark>
+              <span>
+                {paragraph.slice(
+                  paragraph
+                    .toLowerCase()
+                    .indexOf(appData.searchNote.toLowerCase()) +
+                    appData.searchNote.length
+                )}
+              </span>
+            </p>
+          ) : (
+            <p>{paragraph}</p>
+          )}
+        </div>
+      );
+    });
+  };
+
   const createdNotes = appData.notesStore.map((note, index) => {
     const marksOfNotes = marksValues(note);
+    const highlitedNoteHeader = highlitedHeader(note);
+    const highlitedNoteTextOfNote = highlitedTextOfNote(note);
+    const highlitedListModeNote = highlitedListModeTextOfNote(note);
 
     return (
-      <div>
-        {(note.header.includes(appData.searchNote) ||
-          note.textOfNote.includes(appData.searchNote) ||
-          note.listModeTextOfNote.includes(appData.searchNote)) && (
-          <div key={index}>
+      <div key={index}>
+        {(note.header
+          .toLowerCase()
+          .includes(appData.searchNote.toLowerCase()) ||
+          note.textOfNote
+            .toLowerCase()
+            .includes(appData.searchNote.toLowerCase()) ||
+          note.listModeTextOfNote.includes(
+            appData.searchNote.toLowerCase()
+          )) && (
+          <div>
             <DeleteNoteButton
               deleteThisNote={() => deleteSelectedNote(index)}
             />
@@ -153,23 +251,18 @@ export default function NotesField(): JSX.Element {
                 onKeyPress={() => rememberOpenedNote(index)}
               >
                 {note.listMode ? (
-                  <ListedNoteClosed
-                    listModeTextOfNote={note.listModeTextOfNote}
-                    noteHeader={note.header}
+                  <NotEditableListedNote
+                    noteHeader={highlitedNoteHeader}
+                    listModeTextOfNote={highlitedListModeNote}
                   />
                 ) : (
-                  <Note
-                    headerValue={note.header}
-                    textOfNoteValue={note.textOfNote}
-                    headerOnChange={changeHeader}
-                    textOfNoteOnChange={changeTextOfNote}
+                  <NotEditableNote
+                    headerValue={highlitedNoteHeader}
+                    textOfNoteValue={highlitedNoteTextOfNote}
                   />
                 )}
                 {marksOfNotes}
               </div>
-              {appData.notesStore[index].opened && (
-                <CloseNoteButton closeThisNote={closeThisNote} />
-              )}
             </div>
           </div>
         )}
@@ -185,12 +278,12 @@ export default function NotesField(): JSX.Element {
         <div key={index}>
           <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
           {appData.notesStore[appData.noteIndex].listMode ? (
-            <ListModeNote
+            <EditableListedNote
               headerValue={note.header}
               headerOnChange={changeHeader}
             />
           ) : (
-            <Note
+            <EditableNote
               headerValue={note.header}
               textOfNoteValue={note.textOfNote}
               headerOnChange={changeHeader}
@@ -208,13 +301,17 @@ export default function NotesField(): JSX.Element {
 
   const filteredNotes = appData.notesStore.map((note, index) => {
     const marksOfNotes = marksValues(note);
+    const highlitedNoteHeader = highlitedHeader(note);
+    const highlitedNoteTextOfNote = highlitedTextOfNote(note);
+    const highlitedListModeNote = highlitedListModeTextOfNote(note);
+
     return (
       note.marks.includes(appData.marksStore[appData.markIndex]) && (
-        <div>
+        <div key={index}>
           {(note.header.includes(appData.searchNote) ||
             note.textOfNote.includes(appData.searchNote) ||
             note.listModeTextOfNote.includes(appData.searchNote)) && (
-            <div key={index}>
+            <div>
               <DeleteNoteButton
                 deleteThisNote={() => deleteSelectedNote(index)}
               />
@@ -223,17 +320,19 @@ export default function NotesField(): JSX.Element {
                   onClick={() => rememberOpenedNote(index)}
                   onKeyPress={() => rememberOpenedNote(index)}
                 >
-                  <Note
-                    headerValue={note.header}
-                    textOfNoteValue={note.textOfNote}
-                    headerOnChange={changeHeader}
-                    textOfNoteOnChange={changeTextOfNote}
-                  />
+                  {note.listMode ? (
+                    <NotEditableListedNote
+                      noteHeader={highlitedNoteHeader}
+                      listModeTextOfNote={highlitedListModeNote}
+                    />
+                  ) : (
+                    <NotEditableNote
+                      headerValue={highlitedNoteHeader}
+                      textOfNoteValue={highlitedNoteTextOfNote}
+                    />
+                  )}
                   {marksOfNotes}
                 </div>
-                {appData.notesStore[index].opened && (
-                  <CloseNoteButton closeThisNote={closeThisNote} />
-                )}
               </div>
             </div>
           )}
@@ -260,7 +359,7 @@ export default function NotesField(): JSX.Element {
       return (
         <div>
           <DeleteNoteButton deleteThisNote={deleteCreatingNote} />
-          <Note
+          <EditableNote
             headerValue={
               appData.notesStore[appData.notesStore.length - 1].header
             }
@@ -290,6 +389,7 @@ export default function NotesField(): JSX.Element {
       return (
         <div>
           <NoteSearchField />
+          <button onClick={createNewNote}>Create Note</button>
           {filteredNotes}
         </div>
       );

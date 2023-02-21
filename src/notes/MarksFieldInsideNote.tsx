@@ -61,7 +61,7 @@ export default function MarksFieldInsideNote(
         id={props.mark}
         name="marks"
         value={props.mark}
-        checked
+        defaultChecked
       />
     ) : (
       <input type="checkbox" id={props.mark} name="marks" value={props.mark} />

@@ -7,7 +7,7 @@ interface NoteTemplate {
   marks: string[];
   opened: boolean;
   listMode: boolean;
-  listModeTextOfNote: string[];
+  listModeTextOfNote: { text: string; checked: boolean }[];
 }
 
 type StoreTypes = {
@@ -140,23 +140,70 @@ export const dataStoreSlice = createSlice({
     },
     showListInNote: (state) => {
       if (state.notesStore[state.noteIndex].listMode) {
-        state.notesStore[state.noteIndex].listModeTextOfNote = state.notesStore[
-          state.noteIndex
-        ].textOfNote.split(/\n/);
+        state.notesStore[state.noteIndex].listModeTextOfNote = [];
+        state.notesStore[state.noteIndex].textOfNote
+          .split(/\n/)
+          .forEach((paragraph) => {
+            if (paragraph !== "") {
+              return state.notesStore[state.noteIndex].listModeTextOfNote.push({
+                text: paragraph,
+                checked: false
+              });
+            }
+          });
       } else {
-        state.notesStore[state.noteIndex].textOfNote = state.notesStore[
-          state.noteIndex
-        ].listModeTextOfNote.join(`\n`);
+        state.notesStore[state.noteIndex].textOfNote = "";
+        state.notesStore[state.noteIndex].listModeTextOfNote.forEach(
+          (paragraph) => {
+            return (state.notesStore[
+              state.noteIndex
+            ].textOfNote += `${paragraph.text}\n`);
+          }
+        );
       }
     },
     changeListTextOfNote: (state, action: PayloadAction<string>) => {
       state.notesStore[state.noteIndex].listModeTextOfNote[
         state.listTextOfNoteIndex
-      ] = action.payload;
+      ].text = action.payload;
     },
     searchedNoteText: (state, action: PayloadAction<string>) => {
       state.searchNote = action.payload;
     },
+    addParagraphInListedNote: (state) => {
+      let paragraph =
+        state.notesStore[state.noteIndex].listModeTextOfNote[
+          state.listTextOfNoteIndex
+        ];
+      if (paragraph.text.endsWith(`\n`)) {
+        state.notesStore[state.noteIndex].listModeTextOfNote.splice(
+          state.listTextOfNoteIndex + 1,
+          0,
+          {
+            text: "",
+            checked: false
+          }
+        );
+      }
+    },
+    deleteEnterFromNote: (state) => {
+      let paragraph =
+        state.notesStore[state.noteIndex].listModeTextOfNote[
+          state.listTextOfNoteIndex
+        ];
+      if (paragraph.text.endsWith(`\n`)) {
+        state.notesStore[state.noteIndex].listModeTextOfNote[
+          state.listTextOfNoteIndex
+        ].text = paragraph.text.slice(0, paragraph.text.length - 1);
+      }
+    },
+    switchParagraphCheked: (state) => {
+      state.notesStore[state.noteIndex].listModeTextOfNote[
+        state.listTextOfNoteIndex
+      ].checked = !state.notesStore[state.noteIndex].listModeTextOfNote[
+        state.listTextOfNoteIndex
+      ].checked;
+    }
   }
 });
 
@@ -186,7 +233,10 @@ export const {
   saveListTextOfNoteIndex,
   showListInNote,
   changeListTextOfNote,
-  searchedNoteText
+  searchedNoteText,
+  addParagraphInListedNote,
+  deleteEnterFromNote,
+  switchParagraphCheked
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;

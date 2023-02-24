@@ -194,22 +194,24 @@ export default function NotesField(): JSX.Element {
   const highlitedListModeTextOfNote = (note: NoteTemplate) => {
     return note.listModeTextOfNote.map((paragraph) => {
       return (
-        <div key={paragraph}>
-          {paragraph.toLowerCase().includes(appData.searchNote.toLowerCase()) &&
+        <div key={paragraph.text}>
+          {paragraph.text
+            .toLowerCase()
+            .includes(appData.searchNote.toLowerCase()) &&
           appData.searchNote !== "" ? (
             <p>
               <span>
-                {paragraph
+                {paragraph.text
                   .toLowerCase()
                   .slice(
                     0,
-                    paragraph.indexOf(appData.searchNote.toLowerCase())
+                    paragraph.text.indexOf(appData.searchNote.toLowerCase())
                   )}
               </span>
               <mark>{appData.searchNote}</mark>
               <span>
-                {paragraph.slice(
-                  paragraph
+                {paragraph.text.slice(
+                  paragraph.text
                     .toLowerCase()
                     .indexOf(appData.searchNote.toLowerCase()) +
                     appData.searchNote.length
@@ -217,7 +219,7 @@ export default function NotesField(): JSX.Element {
               </span>
             </p>
           ) : (
-            <p>{paragraph}</p>
+            <p>{paragraph.text}</p>
           )}
         </div>
       );

@@ -11,12 +11,12 @@ import {
   deleteEmptyParagraph
 } from "../features/dataStore/dataStoreSlice";
 
-interface EditableListedNoteProps {
+interface CreatingleListedNoteProps {
   headerValue: string;
   headerOnChange: React.ChangeEventHandler<HTMLTextAreaElement>;
 }
 
-export default function EditableListedNote(props: EditableListedNoteProps) {
+export default function CreatingListedNote(props: CreatingleListedNoteProps) {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
 
@@ -43,7 +43,7 @@ export default function EditableListedNote(props: EditableListedNoteProps) {
   }
 
   const listModeText = appData.notesStore[
-    appData.noteIndex
+    appData.notesStore.length - 1
   ].listModeTextOfNote.map((paragraph, index) => {
     return (
       <div key={index}>

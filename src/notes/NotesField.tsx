@@ -2,6 +2,7 @@ import React from "react";
 import EditableNote from "./EditableNote";
 import NotEditableNote from "./NotEditableNote";
 import EditableListedNote from "./EditableListedNote";
+import CreatingListedNote from "./CreatingListedNote";
 import NotEditableListedNote from "./NotEditableListedNote";
 import CloseNoteButton from "./CloseNoteButton";
 import DeleteNoteButton from "./DeleteNoteButton";
@@ -274,7 +275,6 @@ export default function NotesField(): JSX.Element {
 
   const openedNote = appData.notesStore.map((note, index) => {
     const marksOfNotes = marksValues(note);
-
     return (
       note.opened === true && (
         <div key={index}>
@@ -361,17 +361,27 @@ export default function NotesField(): JSX.Element {
       return (
         <div>
           <DeleteNoteButton deleteThisNote={deleteCreatingNote} />
-          <EditableNote
-            headerValue={
-              appData.notesStore[appData.notesStore.length - 1].header
-            }
-            headerOnChange={addNAoteHeader}
-            textOfNoteValue={
-              appData.notesStore[appData.notesStore.length - 1].textOfNote
-            }
-            textOfNoteOnChange={addTextOfNote}
-          />
-          <div>{marksOfNotes}</div>
+          {appData.notesStore[appData.notesStore.length - 1].listMode ? (
+            <CreatingListedNote
+              headerValue={
+                appData.notesStore[appData.notesStore.length - 1].header
+              }
+              headerOnChange={addNAoteHeader}
+            />
+          ) : (
+            <EditableNote
+              headerValue={
+                appData.notesStore[appData.notesStore.length - 1].header
+              }
+              headerOnChange={addNAoteHeader}
+              textOfNoteValue={
+                appData.notesStore[appData.notesStore.length - 1].textOfNote
+              }
+              textOfNoteOnChange={addTextOfNote}
+            />
+          )}
+          <button onClick={changeListMode}>List</button>
+          {marksOfNotes}
           <button onClick={showMarksField}>Marks</button>
           <button onClick={closeNote}>Close Note</button>
         </div>

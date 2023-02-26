@@ -157,7 +157,7 @@ export const dataStoreSlice = createSlice({
           (paragraph) => {
             return (state.notesStore[
               state.noteIndex
-            ].textOfNote += `${paragraph.text}\n`);
+            ].textOfNote += `${paragraph.text.trim()}\n`);
           }
         );
       }
@@ -175,15 +175,17 @@ export const dataStoreSlice = createSlice({
         state.notesStore[state.noteIndex].listModeTextOfNote[
           state.listTextOfNoteIndex
         ];
-      if (paragraph.text.endsWith(`\n`)) {
-        state.notesStore[state.noteIndex].listModeTextOfNote.splice(
-          state.listTextOfNoteIndex + 1,
-          0,
-          {
-            text: "",
-            checked: false
-          }
-        );
+      if (paragraph !== undefined) {
+        if (paragraph.text.endsWith(`\n`)) {
+          state.notesStore[state.noteIndex].listModeTextOfNote.splice(
+            state.listTextOfNoteIndex + 1,
+            0,
+            {
+              text: "",
+              checked: false
+            }
+          );
+        }
       }
     },
     deleteEnterFromNote: (state) => {
@@ -191,10 +193,12 @@ export const dataStoreSlice = createSlice({
         state.notesStore[state.noteIndex].listModeTextOfNote[
           state.listTextOfNoteIndex
         ];
-      if (paragraph.text.endsWith(`\n`)) {
-        state.notesStore[state.noteIndex].listModeTextOfNote[
-          state.listTextOfNoteIndex
-        ].text = paragraph.text.slice(0, paragraph.text.length - 1);
+      if (paragraph !== undefined) {
+        if (paragraph.text.endsWith(`\n`)) {
+          state.notesStore[state.noteIndex].listModeTextOfNote[
+            state.listTextOfNoteIndex
+          ].text = paragraph.text.slice(0, paragraph.text.length - 1);
+        }
       }
     },
     switchParagraphCheked: (state) => {
@@ -203,6 +207,23 @@ export const dataStoreSlice = createSlice({
       ].checked = !state.notesStore[state.noteIndex].listModeTextOfNote[
         state.listTextOfNoteIndex
       ].checked;
+    },
+    deleteEmptyParagraph: (state) => {
+      let paragraph =
+        state.notesStore[state.noteIndex].listModeTextOfNote[
+          state.listTextOfNoteIndex
+        ];
+      if (paragraph !== undefined) {
+        if (
+          state.notesStore[state.noteIndex].listModeTextOfNote.length > 1 &&
+          paragraph.text === ""
+        ) {
+          state.notesStore[state.noteIndex].listModeTextOfNote.splice(
+            state.listTextOfNoteIndex,
+            1
+          );
+        }
+      }
     }
   }
 });
@@ -236,7 +257,8 @@ export const {
   searchedNoteText,
   addParagraphInListedNote,
   deleteEnterFromNote,
-  switchParagraphCheked
+  switchParagraphCheked,
+  deleteEmptyParagraph
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;

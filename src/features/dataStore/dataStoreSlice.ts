@@ -262,4 +262,4 @@ export const {
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;
-export { NoteTemplate };
+export type { NoteTemplate };

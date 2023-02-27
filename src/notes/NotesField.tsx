@@ -131,6 +131,10 @@ export default function NotesField(): JSX.Element {
     return dispatch(switchListMode()), dispatch(showListInNote());
   }
 
+  function paragraphIncludes(paragraph: { text: string; checked: boolean }) {
+    return paragraph.text.includes(appData.searchNote.toLowerCase());
+  }
+
   const marksValues = (note: NoteTemplate) => {
     return note.marks.map((mark) => {
       return <div key={mark}>{mark}</div>;
@@ -241,8 +245,8 @@ export default function NotesField(): JSX.Element {
           note.textOfNote
             .toLowerCase()
             .includes(appData.searchNote.toLowerCase()) ||
-          note.listModeTextOfNote.includes(
-            appData.searchNote.toLowerCase()
+          note.listModeTextOfNote.some((paragraph) =>
+            paragraphIncludes(paragraph)
           )) && (
           <div>
             <DeleteNoteButton
@@ -312,7 +316,9 @@ export default function NotesField(): JSX.Element {
         <div key={index}>
           {(note.header.includes(appData.searchNote) ||
             note.textOfNote.includes(appData.searchNote) ||
-            note.listModeTextOfNote.includes(appData.searchNote)) && (
+            note.listModeTextOfNote.some((paragraph) =>
+              paragraphIncludes(paragraph)
+            )) && (
             <div>
               <DeleteNoteButton
                 deleteThisNote={() => deleteSelectedNote(index)}

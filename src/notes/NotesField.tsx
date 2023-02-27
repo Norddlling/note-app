@@ -9,6 +9,7 @@ import DeleteNoteButton from "./DeleteNoteButton";
 import MarksFieldInsideNote from "./MarksFieldInsideNote";
 import NoteSearchField from "./NoteSearchField";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
+import "./EditableListedNote.css";
 import {
   addNote,
   switchNoteStatus,
@@ -224,7 +225,14 @@ export default function NotesField(): JSX.Element {
               </span>
             </p>
           ) : (
-            <p>{paragraph.text}</p>
+            <p className={paragraph.checked ? "checkedParagraph" : ""}>
+              {paragraph.checked ? (
+                <span className="glyphicon glyphicon-check"></span>
+              ) : (
+                <span className="glyphicon glyphicon-unchecked"></span>
+              )}
+              {paragraph.text}
+            </p>
           )}
         </div>
       );

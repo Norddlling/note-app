@@ -11,10 +11,7 @@ export default function NotEditableListedNote(
   const listModeText = props.listModeTextOfNote.map((paragraph, index) => {
     return (
       <div key={index}>
-        <div>
-          <span className="glyphicon glyphicon-unchecked"></span>
-          {paragraph}
-        </div>
+        <div>{paragraph}</div>
       </div>
     );
   });

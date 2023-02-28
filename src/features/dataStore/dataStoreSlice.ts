@@ -144,9 +144,16 @@ export const dataStoreSlice = createSlice({
         state.notesStore[state.noteIndex].textOfNote
           .split(/\n/)
           .forEach((paragraph) => {
-            if (paragraph !== "") {
+            if (paragraph.length > 0) {
               return state.notesStore[state.noteIndex].listModeTextOfNote.push({
-                text: paragraph,
+                text: ` ${paragraph}`,
+                checked: false
+              });
+            } else if (
+              state.notesStore[state.noteIndex].listModeTextOfNote.length === 0
+            ) {
+              return state.notesStore[state.noteIndex].listModeTextOfNote.push({
+                text: " ",
                 checked: false
               });
             }
@@ -155,9 +162,11 @@ export const dataStoreSlice = createSlice({
         state.notesStore[state.noteIndex].textOfNote = "";
         state.notesStore[state.noteIndex].listModeTextOfNote.forEach(
           (paragraph) => {
-            return (state.notesStore[
-              state.noteIndex
-            ].textOfNote += `${paragraph.text.trim()}\n`);
+            if (paragraph.text !== " ") {
+              return (state.notesStore[
+                state.noteIndex
+              ].textOfNote += `${paragraph.text.trim()}\n`);
+            }
           }
         );
       }
@@ -181,7 +190,7 @@ export const dataStoreSlice = createSlice({
             state.listTextOfNoteIndex + 1,
             0,
             {
-              text: "",
+              text: " ",
               checked: false
             }
           );

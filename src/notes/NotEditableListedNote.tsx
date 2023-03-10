@@ -3,6 +3,7 @@ import React from "react";
 interface PropsNotEditableListedNote {
   listModeTextOfNote: string[] | JSX.Element[];
   noteHeader: string | JSX.Element;
+  darkmode: string;
 }
 
 export default function NotEditableListedNote(
@@ -17,9 +18,9 @@ export default function NotEditableListedNote(
   });
 
   return (
-    <div>
-      <div>{props.noteHeader}</div>
-      {listModeText}
+    <div className={props.darkmode}>
+      <div className="card-header">{props.noteHeader}</div>
+      <div className="card-body">{listModeText}</div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import "./EditableListedNote.css";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
@@ -14,6 +13,8 @@ import {
 interface CreatingleListedNoteProps {
   headerValue: string;
   headerOnChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+  darkmode: string;
+  bgdarkmode: string;
 }
 
 export default function CreatingListedNote(props: CreatingleListedNoteProps) {
@@ -46,7 +47,7 @@ export default function CreatingListedNote(props: CreatingleListedNoteProps) {
     appData.notesStore.length - 1
   ].listModeTextOfNote.map((paragraph, index) => {
     return (
-      <div key={index}>
+      <div key={index} className={"d-flex"}>
         <input
           type="checkbox"
           name="listCheck"
@@ -56,7 +57,9 @@ export default function CreatingListedNote(props: CreatingleListedNoteProps) {
           onChange={switchChecked}
         />
         <textarea
-          className={paragraph.checked ? "checkedParagraph" : ""}
+          className={
+            props.darkmode + (paragraph.checked ? "checkedParagraph" : "")
+          }
           value={paragraph.text}
           onClick={() => clickOnListedParagraph(index)}
           onKeyPress={() => clickOnListedParagraph(index)}
@@ -67,14 +70,14 @@ export default function CreatingListedNote(props: CreatingleListedNoteProps) {
   });
 
   return (
-    <div>
-      <div>
-        <textarea
-          value={props.headerValue}
-          onChange={props.headerOnChange}
-        ></textarea>
-      </div>
-      <div>{listModeText}</div>
+    <div className={props.darkmode}>
+      <textarea
+        className={props.darkmode + " card-header "}
+        rows={3}
+        value={props.headerValue}
+        onChange={props.headerOnChange}
+      ></textarea>
+      <div className="card-body">{listModeText}</div>
     </div>
   );
 }

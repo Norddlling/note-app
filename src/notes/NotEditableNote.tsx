@@ -3,13 +3,14 @@ import React from "react";
 interface NoteProps {
   headerValue: JSX.Element;
   textOfNoteValue: JSX.Element;
+  darkmode: string;
 }
 
 export default function NotEditableNote(props: NoteProps) {
   return (
-    <div>
-      <div>{props.headerValue}</div>
-      <div>{props.textOfNoteValue}</div>
+    <div className={props.darkmode}>
+      <div className="card-header">{props.headerValue}</div>
+      <div className="card-body">{props.textOfNoteValue}</div>
     </div>
   );
 }

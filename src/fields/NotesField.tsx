@@ -1,15 +1,19 @@
 import React from "react";
-import EditableNote from "./EditableNote";
-import NotEditableNote from "./NotEditableNote";
-import EditableListedNote from "./EditableListedNote";
-import CreatingListedNote from "./CreatingListedNote";
-import NotEditableListedNote from "./NotEditableListedNote";
-import CloseNoteButton from "./CloseNoteButton";
-import DeleteNoteButton from "./DeleteNoteButton";
+import EditableNote from "../notes/EditableNote";
+import NotEditableNote from "../notes/NotEditableNote";
+import EditableListedNote from "../notes/EditableListedNote";
+import CreatingListedNote from "../notes/CreatingListedNote";
+import NotEditableListedNote from "../notes/NotEditableListedNote";
+import CloseNoteButton from "../buttons/CloseNoteButton";
+import DeleteButton from "../buttons/DeleteButton";
+import ListModeButton from "../buttons/ListModeButton";
+import MarksButton from "../buttons/MarksButton";
+import CreateButton from "../buttons/CreateButton";
+import ReturnButton from "../buttons/ReturnButton";
 import MarksFieldInsideNote from "./MarksFieldInsideNote";
 import NoteSearchField from "./NoteSearchField";
+import { Button } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
-import "./EditableListedNote.css";
 import {
   addNote,
   switchNoteStatus,
@@ -31,7 +35,12 @@ import {
   NoteTemplate
 } from "../features/dataStore/dataStoreSlice";
 
-export default function NotesField(): JSX.Element {
+interface NotesFieldProps {
+  darkmode: string;
+  bgdarkmode: string;
+}
+
+export default function NotesField(props: NotesFieldProps): JSX.Element {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
 
@@ -256,10 +265,16 @@ export default function NotesField(): JSX.Element {
           note.listModeTextOfNote.some((paragraph) =>
             paragraphIncludes(paragraph)
           )) && (
-          <div>
-            <DeleteNoteButton
-              deleteThisNote={() => deleteSelectedNote(index)}
-            />
+          <div className={props.darkmode + "my-3 clearfix card shadow"}>
+            <div className={"d-flex justify-content-end"}>
+              <span
+                className="material-icons d-inline-block p-2 cursor-pointer"
+                id="deleteNoteIcon"
+                onClick={() => deleteSelectedNote(index)}
+              >
+                delete
+              </span>
+            </div>
             <div onClick={openThisNote} onKeyPress={openThisNote}>
               <div
                 onClick={() => rememberOpenedNote(index)}
@@ -267,11 +282,13 @@ export default function NotesField(): JSX.Element {
               >
                 {note.listMode ? (
                   <NotEditableListedNote
+                    darkmode={props.darkmode}
                     noteHeader={highlitedNoteHeader}
                     listModeTextOfNote={highlitedListModeNote}
                   />
                 ) : (
                   <NotEditableNote
+                    darkmode={props.darkmode}
                     headerValue={highlitedNoteHeader}
                     textOfNoteValue={highlitedNoteTextOfNote}
                   />
@@ -290,24 +307,47 @@ export default function NotesField(): JSX.Element {
     return (
       note.opened === true && (
         <div key={index}>
-          <DeleteNoteButton deleteThisNote={() => deleteSelectedNote(index)} />
-          {appData.notesStore[appData.noteIndex].listMode ? (
-            <EditableListedNote
-              headerValue={note.header}
-              headerOnChange={changeHeader}
-            />
-          ) : (
-            <EditableNote
-              headerValue={note.header}
-              textOfNoteValue={note.textOfNote}
-              headerOnChange={changeHeader}
-              textOfNoteOnChange={changeTextOfNote}
-            />
-          )}
-          <button onClick={changeListMode}>List</button>
+          <div className={props.darkmode + "card shadow"}>
+            <div className={"clearfix"}>
+              <span
+                className="glyphicon glyphicon-remove d-inline-block p-2 cursor-pointer"
+                onClick={closeThisNote}
+              ></span>
+              <span
+                className="material-icons d-inline-block float-end p-2 cursor-pointer"
+                id="deleteNoteIcon"
+                onClick={() => deleteSelectedNote(index)}
+              >
+                delete
+              </span>
+            </div>
+            {appData.notesStore[appData.noteIndex].listMode ? (
+              <EditableListedNote
+                headerValue={note.header}
+                darkmode={props.darkmode}
+                bgdarkmode={props.bgdarkmode}
+                headerOnChange={changeHeader}
+              />
+            ) : (
+              <EditableNote
+                darkmode={props.darkmode}
+                bgdarkmode={props.bgdarkmode}
+                headerValue={note.header}
+                textOfNoteValue={note.textOfNote}
+                headerOnChange={changeHeader}
+                textOfNoteOnChange={changeTextOfNote}
+              />
+            )}
+          </div>
+          <ListModeButton
+            darkmode={props.darkmode + " my-2 me-1 shadow "}
+            changeListMode={changeListMode}
+          />
+          <MarksButton
+            darkmode={props.darkmode + " my-2 mx-1 shadow "}
+            showMarksField={showMarksField}
+          />
           {marksOfNotes}
-          <button onClick={showMarksField}>Marks</button>
-          <CloseNoteButton closeThisNote={closeThisNote} />
         </div>
       )
     );
@@ -327,10 +367,16 @@ export default function NotesField(): JSX.Element {
             note.listModeTextOfNote.some((paragraph) =>
               paragraphIncludes(paragraph)
             )) && (
-            <div>
-              <DeleteNoteButton
-                deleteThisNote={() => deleteSelectedNote(index)}
-              />
+            <div className={props.darkmode + "my-3 card shadow"}>
+              <div className="d-flex justify-content-end">
+                <span
+                  className="material-icons d-inline-block p-2 cursor-pointer"
+                  id="deleteNoteIcon"
+                  onClick={() => deleteSelectedNote(index)}
+                >
+                  delete
+                </span>
+              </div>
               <div onClick={openThisNote} onKeyPress={openThisNote}>
                 <div
                   onClick={() => rememberOpenedNote(index)}
@@ -338,11 +384,13 @@ export default function NotesField(): JSX.Element {
                 >
                   {note.listMode ? (
                     <NotEditableListedNote
+                      darkmode={props.darkmode}
                       noteHeader={highlitedNoteHeader}
                       listModeTextOfNote={highlitedListModeNote}
                     />
                   ) : (
                     <NotEditableNote
+                      darkmode={props.darkmode}
                       headerValue={highlitedNoteHeader}
                       textOfNoteValue={highlitedNoteTextOfNote}
                     />
@@ -361,8 +409,11 @@ export default function NotesField(): JSX.Element {
     case "show all":
       return (
         <div>
-          <NoteSearchField />
-          <button onClick={createNewNote}>Create Note</button>
+          <NoteSearchField darkmode={props.darkmode} />
+          <CreateButton
+            darkmode={props.darkmode + " create-note-button "}
+            create={createNewNote}
+          />
           {createdNotes}
         </div>
       );
@@ -374,30 +425,53 @@ export default function NotesField(): JSX.Element {
       });
       return (
         <div>
-          <DeleteNoteButton deleteThisNote={deleteCreatingNote} />
-          {appData.notesStore[appData.notesStore.length - 1].listMode ? (
-            <CreatingListedNote
-              headerValue={
-                appData.notesStore[appData.notesStore.length - 1].header
-              }
-              headerOnChange={addNAoteHeader}
-            />
-          ) : (
-            <EditableNote
-              headerValue={
-                appData.notesStore[appData.notesStore.length - 1].header
-              }
-              headerOnChange={addNAoteHeader}
-              textOfNoteValue={
-                appData.notesStore[appData.notesStore.length - 1].textOfNote
-              }
-              textOfNoteOnChange={addTextOfNote}
-            />
-          )}
-          <button onClick={changeListMode}>List</button>
+          <div className={props.darkmode + "card shadow"}>
+            <div className="clearfix">
+              <span
+                className="glyphicon glyphicon-remove d-inline-block p-2 cursor-pointer"
+                onClick={closeNote}
+              ></span>
+              <span
+                className="material-icons d-inline-block float-end p-2 cursor-pointer"
+                id="deleteNoteIcon"
+                onClick={deleteCreatingNote}
+              >
+                delete
+              </span>
+            </div>
+            {appData.notesStore[appData.notesStore.length - 1].listMode ? (
+              <CreatingListedNote
+                darkmode={props.darkmode}
+                bgdarkmode={props.bgdarkmode}
+                headerValue={
+                  appData.notesStore[appData.notesStore.length - 1].header
+                }
+                headerOnChange={addNAoteHeader}
+              />
+            ) : (
+              <EditableNote
+                darkmode={props.darkmode}
+                bgdarkmode={props.bgdarkmode}
+                headerValue={
+                  appData.notesStore[appData.notesStore.length - 1].header
+                }
+                headerOnChange={addNAoteHeader}
+                textOfNoteValue={
+                  appData.notesStore[appData.notesStore.length - 1].textOfNote
+                }
+                textOfNoteOnChange={addTextOfNote}
+              />
+            )}
+          </div>
+          <ListModeButton
+            darkmode={props.darkmode + " my-2 me-1 shadow "}
+            changeListMode={changeListMode}
+          />
+          <MarksButton
+            darkmode={props.darkmode + " my-2 mx-1 shadow "}
+            showMarksField={showMarksField}
+          />
           {marksOfNotes}
-          <button onClick={showMarksField}>Marks</button>
-          <button onClick={closeNote}>Close Note</button>
         </div>
       );
     case "open":
@@ -406,24 +480,37 @@ export default function NotesField(): JSX.Element {
       return (
         <div>
           <div>
-            <button onClick={returnFromMarks}>Return to note</button>
+            <ReturnButton
+              darkmode={props.darkmode + " shadow "}
+              return={returnFromMarks}
+            />
+            <span className="p-2">
+              {appData.notesStore[appData.noteIndex].header}
+            </span>
           </div>
-          <MarksFieldInsideNote markClicked={addMarkInNote} />
+          <MarksFieldInsideNote
+            darkmode={props.darkmode}
+            bgdarkmode={props.bgdarkmode}
+            markClicked={addMarkInNote}
+          />
         </div>
       );
     case "filtered by marks":
       return (
         <div>
-          <NoteSearchField />
-          <button onClick={createNewNote}>Create Note</button>
+          <NoteSearchField darkmode={props.darkmode} />
+          <CreateButton
+            darkmode={props.darkmode + " create-note-button "}
+            create={createNewNote}
+          />
           {filteredNotes}
         </div>
       );
     default:
       return (
         <div>
-          <NoteSearchField />
-          <button onClick={createNewNote}>Create Note</button>
+          <NoteSearchField darkmode={props.darkmode} />
+          <CreateButton darkmode={props.darkmode} create={createNewNote} />
           {createdNotes}
         </div>
       );

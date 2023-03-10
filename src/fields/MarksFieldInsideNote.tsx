@@ -1,18 +1,27 @@
 import React from "react";
-import Mark from "./Mark";
+import Mark from "../marks/Mark";
+import CreateButton from "../buttons/CreateButton";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
-  switchNoteStatus,
   markSearchbarUpdate,
   addNewMark,
   deleteMark,
+  removeMarkFromNote,
   removeMarkFromAllNotes,
   holdMark,
   saveMarkIndex
 } from "../features/dataStore/dataStoreSlice";
 
-export default function MarksFieldOutsideNote(): JSX.Element {
+interface MatksFieldProps {
+  markClicked: React.MouseEventHandler<HTMLDivElement>;
+  darkmode: string;
+  bgdarkmode: string;
+}
+
+export default function MarksFieldInsideNote(
+  props: MatksFieldProps
+): JSX.Element {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
 
@@ -28,6 +37,7 @@ export default function MarksFieldOutsideNote(): JSX.Element {
     return (
       dispatch(saveMarkIndex(index)),
       dispatch(holdMark()),
+      dispatch(removeMarkFromNote()),
       dispatch(removeMarkFromAllNotes()),
       dispatch(deleteMark())
     );
@@ -43,27 +53,21 @@ export default function MarksFieldOutsideNote(): JSX.Element {
   }
 
   function saveMark(index: number) {
-    return dispatch(saveMarkIndex(index));
-  }
-
-  function filterByMarks() {
-    return dispatch(switchNoteStatus("filtered by marks"));
-  }
-
-  function resetMarksFilter() {
-    return dispatch(switchNoteStatus("show all"));
+    return dispatch(saveMarkIndex(index)), dispatch(holdMark());
   }
 
   function MarkInput(props: MarkInputProps) {
-    return (
-      <div>
-        <input
-          type="radio"
-          id={props.mark}
-          name="filterMark"
-          value={props.mark}
-        />
-      </div>
+    return appData.notesStore[appData.noteIndex] !== undefined &&
+      appData.notesStore[appData.noteIndex].marks.includes(props.mark) ? (
+      <input
+        type="checkbox"
+        id={props.mark}
+        name="marks"
+        value={props.mark}
+        defaultChecked
+      />
+    ) : (
+      <input type="checkbox" id={props.mark} name="marks" value={props.mark} />
     );
   }
 
@@ -73,10 +77,11 @@ export default function MarksFieldOutsideNote(): JSX.Element {
         <div key={mark}>
           <Mark
             mark={mark}
-            markClicked={filterByMarks}
+            markClicked={props.markClicked}
             markInput={<MarkInput mark={mark} />}
             deleteMark={() => deleteThisMark(index)}
             clickOnMark={() => saveMark(index)}
+            darkmode={props.darkmode}
           />
         </div>
       )
@@ -84,34 +89,21 @@ export default function MarksFieldOutsideNote(): JSX.Element {
   });
 
   return (
-    <div>
-      {(appData.noteStatus === "show all" ||
-        appData.noteStatus === "filtered by marks") && (
-        <div>
-          <div>
-            <input
-              type="text"
-              value={appData.searchMark}
-              onChange={findMarkValue}
-            />
-          </div>
-          <button onClick={resetMarksFilter}>
-            <label>
-              <input
-                type="radio"
-                name="filterMark"
-                value="Show all"
-                defaultChecked
-              />
-              <span>Show all</span>
-            </label>
-          </button>
-          <div>{MarksValues}</div>
-          <div>
-            <button onClick={addMark}>Add new mark</button>
-          </div>
-        </div>
-      )}
+    <div className={props.bgdarkmode}>
+      <div className="input-group my-2">
+        <input
+          className={" form-control  shadow " + props.darkmode}
+          type="text"
+          value={appData.searchMark}
+          placeholder="Search marks"
+          onChange={findMarkValue}
+        />
+        <CreateButton
+          darkmode={props.darkmode + " h-100 shadow "}
+          create={addMark}
+        />
+      </div>
+      <div>{MarksValues}</div>
     </div>
   );
 }

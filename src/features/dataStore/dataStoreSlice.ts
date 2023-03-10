@@ -18,9 +18,12 @@ type StoreTypes = {
   marksStore: string[];
   markIndex: number;
   clickedMark: string;
+  selectedMark: string;
   searchMark: string;
   listTextOfNoteIndex: number;
   searchNote: string;
+  showMarksMenu: boolean;
+  darkMode: boolean;
 };
 
 const initialState: StoreTypes = {
@@ -31,9 +34,12 @@ const initialState: StoreTypes = {
   marksStore: [],
   markIndex: 0,
   clickedMark: "",
+  selectedMark: "",
   searchMark: "",
   listTextOfNoteIndex: 0,
-  searchNote: ""
+  searchNote: "",
+  showMarksMenu: false,
+  darkMode: false
 };
 
 export const dataStoreSlice = createSlice({
@@ -57,7 +63,9 @@ export const dataStoreSlice = createSlice({
       state.notesStore.push(action.payload);
     },
     createNoteHeader: (state, action: PayloadAction<string>) => {
-      state.notesStore[state.notesStore.length - 1].header = action.payload;
+      if (action.payload.length <= 30) {
+        state.notesStore[state.notesStore.length - 1].header = action.payload;
+      }
     },
     createNoteTextOfNote: (state, action: PayloadAction<string>) => {
       state.notesStore[state.notesStore.length - 1].textOfNote = action.payload;
@@ -71,7 +79,9 @@ export const dataStoreSlice = createSlice({
       }
     },
     changeHeaderValue: (state, action: PayloadAction<string>) => {
-      state.notesStore[state.noteIndex].header = action.payload;
+      if (action.payload.length <= 30) {
+        state.notesStore[state.noteIndex].header = action.payload;
+      }
     },
     changeTextOfNoteValue: (state, action: PayloadAction<string>) => {
       state.notesStore[state.noteIndex].textOfNote = action.payload;
@@ -83,7 +93,11 @@ export const dataStoreSlice = createSlice({
       state.notesStore.splice(state.noteIndex, 1);
     },
     markSearchbarUpdate: (state, action: PayloadAction<string>) => {
-      state.searchMark = action.payload;
+      if (action.payload.length <= 20) {
+        state.searchMark = action.payload;
+      } else {
+        alert("Mark name is too long");
+      }
     },
     addNewMark: (state, action: PayloadAction<string>) => {
       state.marksStore.push(action.payload);
@@ -116,6 +130,12 @@ export const dataStoreSlice = createSlice({
     },
     holdMark: (state) => {
       state.clickedMark = state.marksStore[state.markIndex];
+    },
+    holdSelectedMark: (state) => {
+      state.selectedMark = state.marksStore[state.markIndex];
+    },
+    holdShowAllMark: (state) => {
+      state.selectedMark = "show all";
     },
     addMarkInsideNote: (state) => {
       if (
@@ -233,6 +253,15 @@ export const dataStoreSlice = createSlice({
           );
         }
       }
+    },
+    showMarksMenu: (state) => {
+      state.showMarksMenu = true;
+    },
+    hideMarksMenu: (state) => {
+      state.showMarksMenu = false;
+    },
+    changeNightMode: (state) => {
+      state.darkMode = !state.darkMode;
     }
   }
 });
@@ -256,6 +285,8 @@ export const {
   removeMarkFromAllNotes,
   saveNoteStatus,
   holdMark,
+  holdSelectedMark,
+  holdShowAllMark,
   saveMarkIndex,
   creatingNoteIndex,
   addMarkInsideNote,
@@ -267,7 +298,10 @@ export const {
   addParagraphInListedNote,
   deleteEnterFromNote,
   switchParagraphCheked,
-  deleteEmptyParagraph
+  deleteEmptyParagraph,
+  showMarksMenu,
+  hideMarksMenu,
+  changeNightMode
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;

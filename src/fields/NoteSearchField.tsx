@@ -5,7 +5,7 @@ import {
   searchedNoteText
 } from "../features/dataStore/dataStoreSlice";
 
-export default function NoteSearchField() {
+export default function NoteSearchField(props: { darkmode: string }) {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
 
@@ -14,9 +14,11 @@ export default function NoteSearchField() {
   }
 
   return (
-    <div>
+    <div className={props.darkmode + " mb-3 shadow "}>
       <input
+        className={" form-control " + props.darkmode}
         value={appData.searchNote}
+        placeholder="Search notes"
         onChange={filterNoteByText}
         type="search"
         id="noteSearchField"

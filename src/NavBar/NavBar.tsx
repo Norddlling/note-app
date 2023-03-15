@@ -37,14 +37,14 @@ export default function Navbar(props: NavBarProps) {
           className={props.darkmode + "float-end shadow"}
           onClick={handleNightMode}
         >
-          <span className="fa fa-moon-o"></span>
+          <span className="fa fa-moon-o px-1"></span>
         </Button>
       ) : (
         <Button
           className={props.darkmode + "float-end shadow"}
           onClick={handleNightMode}
         >
-          <span className="fa fa-sun-o"></span>
+          <span className="fa fa-sun-o px-1"></span>
         </Button>
       )}
     </nav>

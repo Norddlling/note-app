@@ -1,4 +1,5 @@
-* {
+*,
+.input-text {
   font-size: 1.3rem;
 }
 
@@ -45,4 +46,41 @@ textarea {
   cursor: pointer;
 }
 
-  
+.add-mark-icon {
+  position: relative;
+  left: 1px;
+}
+
+.noteeditablenote-size {
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.notes-list-view--layout {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.table-view-notes-layout {
+  max-width: 1000px;
+}
+
+@media screen and (max-width: 600px) {
+  .notes-view-button-visibility {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .min-size-note-table-view {
+    width: 250px;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+  .table-view-notes-layout {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

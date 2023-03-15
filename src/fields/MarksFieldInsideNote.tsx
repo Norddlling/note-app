@@ -62,12 +62,19 @@ export default function MarksFieldInsideNote(
       <input
         type="checkbox"
         id={props.mark}
+        className="py-3 px-1 align-top cursor-pointer"
         name="marks"
         value={props.mark}
         defaultChecked
       />
     ) : (
-      <input type="checkbox" id={props.mark} name="marks" value={props.mark} />
+      <input
+        type="checkbox"
+        id={props.mark}
+        className="py-3 px-1 align-top cursor-pointer"
+        name="marks"
+        value={props.mark}
+      />
     );
   }
 
@@ -92,7 +99,7 @@ export default function MarksFieldInsideNote(
     <div className={props.bgdarkmode}>
       <div className="input-group my-2">
         <input
-          className={" form-control  shadow " + props.darkmode}
+          className={props.darkmode + " form-control input-text shadow "}
           type="text"
           value={appData.searchMark}
           placeholder="Search marks"

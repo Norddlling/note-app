@@ -4,17 +4,16 @@ import NotEditableNote from "../notes/NotEditableNote";
 import EditableListedNote from "../notes/EditableListedNote";
 import CreatingListedNote from "../notes/CreatingListedNote";
 import NotEditableListedNote from "../notes/NotEditableListedNote";
-import CloseNoteButton from "../buttons/CloseNoteButton";
-import DeleteButton from "../buttons/DeleteButton";
 import ListModeButton from "../buttons/ListModeButton";
 import MarksButton from "../buttons/MarksButton";
 import CreateButton from "../buttons/CreateButton";
 import ReturnButton from "../buttons/ReturnButton";
+import NotesViewButton from "../buttons/NotesViewButton";
 import MarksFieldInsideNote from "./MarksFieldInsideNote";
 import NoteSearchField from "./NoteSearchField";
-import { Button } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
+  dataStore,
   addNote,
   switchNoteStatus,
   openStoredNote,
@@ -27,12 +26,12 @@ import {
   changeTextOfNoteValue,
   deleteEmptyNote,
   deleteExistingNote,
-  dataStore,
   saveNoteStatus,
   addMarkInsideNote,
   switchListMode,
   showListInNote,
-  NoteTemplate
+  NoteTemplate,
+  changeNotesView
 } from "../features/dataStore/dataStoreSlice";
 
 interface NotesFieldProps {
@@ -145,9 +144,17 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
     return paragraph.text.includes(appData.searchNote.toLowerCase());
   }
 
+  function changeViewOfNotes() {
+    return dispatch(changeNotesView());
+  }
+
   const marksValues = (note: NoteTemplate) => {
     return note.marks.map((mark) => {
-      return <div key={mark}>{mark}</div>;
+      return (
+        <div className="d-inline-block mx-2" key={mark}>
+          {mark}
+        </div>
+      );
     });
   };
 
@@ -255,7 +262,10 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
     const highlitedListModeNote = highlitedListModeTextOfNote(note);
 
     return (
-      <div key={index}>
+      <div
+        key={index}
+        className={appData.notesTableView ? "min-size-note-table-view" : ""}
+      >
         {(note.header
           .toLowerCase()
           .includes(appData.searchNote.toLowerCase()) ||
@@ -265,7 +275,13 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
           note.listModeTextOfNote.some((paragraph) =>
             paragraphIncludes(paragraph)
           )) && (
-          <div className={props.darkmode + "my-3 clearfix card shadow"}>
+          <div
+            className={
+              appData.notesTableView
+                ? props.darkmode + "my-3 clearfix card shadow "
+                : props.darkmode + " my-3 clearfix card shadow "
+            }
+          >
             <div className={"d-flex justify-content-end"}>
               <span
                 className="material-icons d-inline-block p-2 cursor-pointer"
@@ -293,7 +309,7 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
                     textOfNoteValue={highlitedNoteTextOfNote}
                   />
                 )}
-                {marksOfNotes}
+                <div className="card-footer">{marksOfNotes}</div>
               </div>
             </div>
           </div>
@@ -338,6 +354,7 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
                 textOfNoteOnChange={changeTextOfNote}
               />
             )}
+            <div className="card-footer">{marksOfNotes}</div>
           </div>
           <ListModeButton
             darkmode={props.darkmode + " my-2 me-1 shadow "}
@@ -347,7 +364,6 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
             darkmode={props.darkmode + " my-2 mx-1 shadow "}
             showMarksField={showMarksField}
           />
-          {marksOfNotes}
         </div>
       )
     );
@@ -360,14 +376,23 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
     const highlitedListModeNote = highlitedListModeTextOfNote(note);
 
     return (
-      note.marks.includes(appData.marksStore[appData.markIndex]) && (
-        <div key={index}>
+      note.marks.indexOf(appData.marksStore[appData.markIndex]) >= 0 && (
+        <div
+          key={index}
+          className={appData.notesTableView ? "min-size-note-table-view" : ""}
+        >
           {(note.header.includes(appData.searchNote) ||
             note.textOfNote.includes(appData.searchNote) ||
             note.listModeTextOfNote.some((paragraph) =>
               paragraphIncludes(paragraph)
             )) && (
-            <div className={props.darkmode + "my-3 card shadow"}>
+            <div
+              className={
+                appData.notesTableView
+                  ? props.darkmode + "my-3 clearfix card shadow "
+                  : props.darkmode + " my-3 clearfix card shadow "
+              }
+            >
               <div className="d-flex justify-content-end">
                 <span
                   className="material-icons d-inline-block p-2 cursor-pointer"
@@ -395,7 +420,7 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
                       textOfNoteValue={highlitedNoteTextOfNote}
                     />
                   )}
-                  {marksOfNotes}
+                  <div className="card-footer">{marksOfNotes}</div>
                 </div>
               </div>
             </div>
@@ -408,20 +433,40 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
   switch (appData.noteStatus) {
     case "show all":
       return (
-        <div>
+        <div className="clearfix">
           <NoteSearchField darkmode={props.darkmode} />
-          <CreateButton
-            darkmode={props.darkmode + " create-note-button "}
-            create={createNewNote}
-          />
-          {createdNotes}
+          <div>
+            <CreateButton
+              darkmode={props.darkmode + " create-note-button "}
+              create={createNewNote}
+            />
+            <NotesViewButton
+              darkmode={
+                props.darkmode + "float-end shadow notes-view-button-visibility"
+              }
+              changeViewOfNotes={changeViewOfNotes}
+            />
+          </div>
+          <div
+            className={
+              appData.notesTableView
+                ? "table-view-notes-layout notes-field-maxwith"
+                : "notes-list-view-layout"
+            }
+          >
+            {createdNotes}
+          </div>
         </div>
       );
     case "creating":
       const marksOfNotes = appData.notesStore[
         appData.notesStore.length - 1
       ].marks.map((mark) => {
-        return <div key={mark}>{mark}</div>;
+        return (
+          <div className="d-inline-block mx-2" key={mark}>
+            {mark}
+          </div>
+        );
       });
       return (
         <div>
@@ -462,6 +507,7 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
                 textOfNoteOnChange={addTextOfNote}
               />
             )}
+            <div className="card-footer">{marksOfNotes}</div>
           </div>
           <ListModeButton
             darkmode={props.darkmode + " my-2 me-1 shadow "}
@@ -471,7 +517,6 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
             darkmode={props.darkmode + " my-2 mx-1 shadow "}
             showMarksField={showMarksField}
           />
-          {marksOfNotes}
         </div>
       );
     case "open":
@@ -479,12 +524,12 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
     case "add mark":
       return (
         <div>
-          <div>
+          <div className="d-flex">
             <ReturnButton
               darkmode={props.darkmode + " shadow "}
               return={returnFromMarks}
             />
-            <span className="p-2">
+            <span className="p-2 text-break">
               {appData.notesStore[appData.noteIndex].header}
             </span>
           </div>
@@ -503,7 +548,21 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
             darkmode={props.darkmode + " create-note-button "}
             create={createNewNote}
           />
-          {filteredNotes}
+          <NotesViewButton
+            darkmode={
+              props.darkmode + "float-end shadow notes-view-button-visibility"
+            }
+            changeViewOfNotes={changeViewOfNotes}
+          />
+          <div
+            className={
+              appData.notesTableView
+                ? "table-view-notes-layout notes-field-maxwith"
+                : "notes-list-view-layout"
+            }
+          >
+            {filteredNotes}
+          </div>
         </div>
       );
     default:
@@ -511,7 +570,21 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
         <div>
           <NoteSearchField darkmode={props.darkmode} />
           <CreateButton darkmode={props.darkmode} create={createNewNote} />
-          {createdNotes}
+          <NotesViewButton
+            darkmode={
+              props.darkmode + "float-end shadow notes-view-button-visibility"
+            }
+            changeViewOfNotes={changeViewOfNotes}
+          />
+          <div
+            className={
+              appData.notesTableView
+                ? "table-view-notes-layout notes-field-maxwith"
+                : "notes-list-view-layout"
+            }
+          >
+            {createdNotes}
+          </div>
         </div>
       );
   }

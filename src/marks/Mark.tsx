@@ -16,12 +16,14 @@ export default function Mark(props: MarkProps): JSX.Element {
     <div className="d-flex mx-1 my-3">
       <div onClick={props.markClicked}>
         <Button
-          className={props.darkmode + "p-0 shadow"}
+          className={props.darkmode + " px-0 pt-1 pb-0 shadow "}
           onClick={props.clickOnMark}
         >
           <label className="px-2" htmlFor={props.mark}>
             {props.markInput}
-            <span className="py-2 px-1 align-bottom">{props.mark}</span>
+            <span className="py-3 px-1 align-bottom cursor-pointer">
+              {props.mark}
+            </span>
           </label>
         </Button>
       </div>

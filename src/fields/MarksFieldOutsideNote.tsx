@@ -76,7 +76,7 @@ export default function MarksFieldOutsideNote(
       <span>
         <input
           type="radio"
-          className="py-2 px-1 align-middle"
+          className="py-3 px-1 align-top cursor-pointer"
           id={props.mark}
           name="filterMark"
           value={props.mark}
@@ -121,7 +121,7 @@ export default function MarksFieldOutsideNote(
         <Offcanvas.Body className={props.bgdarkmode} id="marksMenuRoot">
           <div className="input-group my-3 mx-1 ">
             <input
-              className={" form-control shadow " + props.darkmode}
+              className={" form-control shadow input-text" + props.darkmode}
               type="text"
               value={appData.searchMark}
               placeholder="Search marks"
@@ -132,14 +132,14 @@ export default function MarksFieldOutsideNote(
               create={addMark}
             />
           </div>
-          <div className="m-1">
+          <div className="m-1 p-0">
             <Button
-              className={props.darkmode + "p-0 shadow"}
+              className={props.darkmode + " px-0 pt-1 pb-0 shadow "}
               onClick={resetMarksFilter}
             >
               <label className="px-2" htmlFor="showAll">
                 <input
-                  className="py-2 px-1 align-middle"
+                  className="py-3 px-1 align-top cursor-pointer "
                   id="showAll"
                   type="radio"
                   name="filterMark"
@@ -150,7 +150,9 @@ export default function MarksFieldOutsideNote(
                       : true
                   }
                 />
-                <span className="py-2 px-1 align-bottom">Show all</span>
+                <span className="py-3 px-1 align-bottom cursor-pointer ">
+                  Show all
+                </span>
               </label>
             </Button>
           </div>

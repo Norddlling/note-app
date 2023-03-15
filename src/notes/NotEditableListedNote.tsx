@@ -20,7 +20,7 @@ export default function NotEditableListedNote(
   return (
     <div className={props.darkmode}>
       <div className="card-header">{props.noteHeader}</div>
-      <div className="card-body">{listModeText}</div>
+      <div className="card-body noteeditablenote-size">{listModeText}</div>
     </div>
   );
 }

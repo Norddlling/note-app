@@ -24,6 +24,7 @@ type StoreTypes = {
   searchNote: string;
   showMarksMenu: boolean;
   darkMode: boolean;
+  notesTableView: boolean;
 };
 
 const initialState: StoreTypes = {
@@ -39,7 +40,8 @@ const initialState: StoreTypes = {
   listTextOfNoteIndex: 0,
   searchNote: "",
   showMarksMenu: false,
-  darkMode: false
+  darkMode: false,
+  notesTableView: false
 };
 
 export const dataStoreSlice = createSlice({
@@ -63,7 +65,7 @@ export const dataStoreSlice = createSlice({
       state.notesStore.push(action.payload);
     },
     createNoteHeader: (state, action: PayloadAction<string>) => {
-      if (action.payload.length <= 30) {
+      if (action.payload.length <= 50) {
         state.notesStore[state.notesStore.length - 1].header = action.payload;
       }
     },
@@ -79,7 +81,7 @@ export const dataStoreSlice = createSlice({
       }
     },
     changeHeaderValue: (state, action: PayloadAction<string>) => {
-      if (action.payload.length <= 30) {
+      if (action.payload.length <= 50) {
         state.notesStore[state.noteIndex].header = action.payload;
       }
     },
@@ -262,6 +264,9 @@ export const dataStoreSlice = createSlice({
     },
     changeNightMode: (state) => {
       state.darkMode = !state.darkMode;
+    }, 
+    changeNotesView : (state) => {
+      state.notesTableView = !state.notesTableView
     }
   }
 });
@@ -301,7 +306,8 @@ export const {
   deleteEmptyParagraph,
   showMarksMenu,
   hideMarksMenu,
-  changeNightMode
+  changeNightMode,
+  changeNotesView
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;

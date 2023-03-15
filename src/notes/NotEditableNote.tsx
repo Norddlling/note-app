@@ -10,7 +10,9 @@ export default function NotEditableNote(props: NoteProps) {
   return (
     <div className={props.darkmode}>
       <div className="card-header">{props.headerValue}</div>
-      <div className="card-body">{props.textOfNoteValue}</div>
+      <div className="card-body noteeditablenote-size">
+        {props.textOfNoteValue}
+      </div>
     </div>
   );
 }

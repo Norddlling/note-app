@@ -10,7 +10,7 @@ export default function CreateButton(props: CreateButtonProps) {
   return (
     <span>
       <Button className={props.darkmode + " shadow "} onClick={props.create}>
-        <span className="glyphicon glyphicon-plus"></span>
+        <span className="glyphicon glyphicon-plus add-mark-icon"></span>
       </Button>
     </span>
   );

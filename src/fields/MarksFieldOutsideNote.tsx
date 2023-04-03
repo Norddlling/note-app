@@ -1,18 +1,17 @@
 import Mark from "../marks/Mark";
-import CreateButton from "../buttons/CreateButton";
-import { Button } from "react-bootstrap";
-import { Offcanvas } from "react-bootstrap";
+import AddMarkButton from "../buttons/AddMarkButton";
+import ShowAllMarks from "../buttons/ShowAllMarks";
+import DeleteButton from "../buttons/DeleteButton";
+import { Offcanvas, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
   switchNoteStatus,
   markSearchbarUpdate,
-  addNewMark,
   deleteMark,
   removeMarkFromAllNotes,
   holdMark,
   holdSelectedMark,
-  holdShowAllMark,
   saveMarkIndex,
   hideMarksMenu
 } from "../features/dataStore/dataStoreSlice";
@@ -46,25 +45,12 @@ export default function MarksFieldOutsideNote(
     );
   }
 
-  function addMark() {
-    if (appData.searchMark !== "") {
-      return (
-        dispatch(addNewMark(appData.searchMark)),
-        dispatch(markSearchbarUpdate(""))
-      );
-    }
-  }
-
   function saveMark(index: number) {
     return dispatch(saveMarkIndex(index)), dispatch(holdSelectedMark());
   }
 
   function filterByMarks() {
     return dispatch(switchNoteStatus("filtered by marks"));
-  }
-
-  function resetMarksFilter() {
-    return dispatch(switchNoteStatus("show all")), dispatch(holdShowAllMark());
   }
 
   function CloseMarksMenu() {
@@ -89,20 +75,70 @@ export default function MarksFieldOutsideNote(
   const MarksValues = appData.marksStore.map((mark, index) => {
     return (
       mark.includes(appData.searchMark) && (
-        <div key={mark}>
-          <Mark
-            mark={mark}
-            markClicked={filterByMarks}
-            markInput={
-              <MarkInput
-                mark={mark}
-                defaultChecked={appData.selectedMark === mark ? true : false}
-              />
-            }
-            deleteMark={() => deleteThisMark(index)}
-            clickOnMark={() => saveMark(index)}
-            darkmode={props.darkmode}
-          />
+        <div key={mark} className="d-flex mx-1 my-3">
+          {appData.tutorialMode ? (
+            <OverlayTrigger
+              placement="bottom"
+              overlay={
+                <Tooltip>
+                  Show notes with <strong>{mark}</strong> mark.
+                </Tooltip>
+              }
+            >
+              <div>
+                <Mark
+                  mark={mark}
+                  markClicked={filterByMarks}
+                  markInput={
+                    <MarkInput
+                      mark={mark}
+                      defaultChecked={
+                        appData.selectedMark === mark ? true : false
+                      }
+                    />
+                  }
+                  clickOnMark={() => saveMark(index)}
+                  darkmode={props.darkmode}
+                />
+              </div>
+            </OverlayTrigger>
+          ) : (
+            <Mark
+              mark={mark}
+              markClicked={filterByMarks}
+              markInput={
+                <MarkInput
+                  mark={mark}
+                  defaultChecked={appData.selectedMark === mark ? true : false}
+                />
+              }
+              clickOnMark={() => saveMark(index)}
+              darkmode={props.darkmode}
+            />
+          )}
+          {appData.tutorialMode ? (
+            <OverlayTrigger
+              placement="bottom"
+              overlay={
+                <Tooltip>
+                  Delete <strong>{mark}</strong> mark. Also delete
+                  <strong>{" " + mark}</strong> mark from all notes.
+                </Tooltip>
+              }
+            >
+              <div>
+                <DeleteButton
+                  darkmode={props.darkmode + " h-100 py-0 mx-1 shadow"}
+                  delete={() => deleteThisMark(index)}
+                />
+              </div>
+            </OverlayTrigger>
+          ) : (
+            <DeleteButton
+              darkmode={props.darkmode + " h-100 py-0 mx-1 shadow"}
+              delete={() => deleteThisMark(index)}
+            />
+          )}
         </div>
       )
     );
@@ -121,40 +157,18 @@ export default function MarksFieldOutsideNote(
         <Offcanvas.Body className={props.bgdarkmode} id="marksMenuRoot">
           <div className="input-group my-3 mx-1 ">
             <input
-              className={" form-control shadow input-text" + props.darkmode}
+              className={
+                " form-control form-control-lg shadow " + props.darkmode
+              }
               type="text"
               value={appData.searchMark}
               placeholder="Search marks"
               onChange={findMarkValue}
             />
-            <CreateButton
-              darkmode={props.darkmode + " h-100 shadow "}
-              create={addMark}
-            />
+            <AddMarkButton darkmode={props.darkmode} />
           </div>
           <div className="m-1 p-0">
-            <Button
-              className={props.darkmode + " px-0 pt-1 pb-0 shadow "}
-              onClick={resetMarksFilter}
-            >
-              <label className="px-2" htmlFor="showAll">
-                <input
-                  className="py-3 px-1 align-top cursor-pointer "
-                  id="showAll"
-                  type="radio"
-                  name="filterMark"
-                  value="Show all"
-                  defaultChecked={
-                    appData.marksStore.includes(appData.selectedMark)
-                      ? false
-                      : true
-                  }
-                />
-                <span className="py-3 px-1 align-bottom cursor-pointer ">
-                  Show all
-                </span>
-              </label>
-            </Button>
+            <ShowAllMarks darkmode={props.darkmode} />
           </div>
           <div>{MarksValues}</div>
         </Offcanvas.Body>

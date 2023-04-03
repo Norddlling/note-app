@@ -1,5 +1,7 @@
 import * as React from "react";
-import { Button } from "react-bootstrap";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { useAppSelector } from "../app/hooks";
+import { dataStore } from "../features/dataStore/dataStoreSlice";
 
 interface ReturnButtonProps {
   return: React.MouseEventHandler<HTMLButtonElement>;
@@ -7,7 +9,20 @@ interface ReturnButtonProps {
 }
 
 export default function ReturnButton(props: ReturnButtonProps) {
-  return (
+  const appData = useAppSelector(dataStore);
+
+  return appData.tutorialMode ? (
+    <OverlayTrigger
+      placement="bottom"
+      overlay={<Tooltip>Return to note</Tooltip>}
+    >
+      <span>
+        <Button className={props.darkmode} onClick={props.return}>
+          <span className="glyphicon glyphicon-arrow-left"></span>
+        </Button>
+      </span>
+    </OverlayTrigger>
+  ) : (
     <span>
       <Button className={props.darkmode} onClick={props.return}>
         <span className="glyphicon glyphicon-arrow-left"></span>

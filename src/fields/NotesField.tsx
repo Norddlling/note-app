@@ -5,23 +5,24 @@ import EditableListedNote from "../notes/EditableListedNote";
 import CreatingListedNote from "../notes/CreatingListedNote";
 import NotEditableListedNote from "../notes/NotEditableListedNote";
 import ListModeButton from "../buttons/ListModeButton";
+import CloseNoteButton from "../buttons/CloseNoteButton";
+import DeleteNoteButton from "../buttons/DeleteNoteButton";
 import MarksButton from "../buttons/MarksButton";
-import CreateButton from "../buttons/CreateButton";
+import CreateNoteButton from "../buttons/CreateNoteButton";
 import ReturnButton from "../buttons/ReturnButton";
 import NotesViewButton from "../buttons/NotesViewButton";
 import MarksFieldInsideNote from "./MarksFieldInsideNote";
 import NoteSearchField from "./NoteSearchField";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
-  addNote,
   switchNoteStatus,
   openStoredNote,
   closeStoredNote,
   createNoteHeader,
   createNoteTextOfNote,
   saveNoteIndex,
-  creatingNoteIndex,
   changeHeaderValue,
   changeTextOfNoteValue,
   deleteEmptyNote,
@@ -42,23 +43,6 @@ interface NotesFieldProps {
 export default function NotesField(props: NotesFieldProps): JSX.Element {
   const appData = useAppSelector(dataStore);
   const dispatch = useAppDispatch();
-
-  function createNewNote() {
-    return (
-      dispatch(
-        addNote({
-          header: "",
-          textOfNote: "",
-          marks: [],
-          opened: false,
-          listMode: false,
-          listModeTextOfNote: []
-        })
-      ),
-      dispatch(creatingNoteIndex()),
-      dispatch(switchNoteStatus("creating"))
-    );
-  }
 
   function closeNote() {
     if (
@@ -283,13 +267,28 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
             }
           >
             <div className={"d-flex justify-content-end"}>
-              <span
-                className="material-icons d-inline-block p-2 cursor-pointer"
-                id="deleteNoteIcon"
-                onClick={() => deleteSelectedNote(index)}
-              >
-                delete
-              </span>
+              {appData.tutorialMode ? (
+                <OverlayTrigger
+                  placement="bottom"
+                  overlay={<Tooltip>Delete this note</Tooltip>}
+                >
+                  <span
+                    className="material-icons d-inline-block p-2 cursor-pointer"
+                    id="deleteNoteIcon"
+                    onClick={() => deleteSelectedNote(index)}
+                  >
+                    delete
+                  </span>
+                </OverlayTrigger>
+              ) : (
+                <span
+                  className="material-icons d-inline-block p-2 cursor-pointer"
+                  id="deleteNoteIcon"
+                  onClick={() => deleteSelectedNote(index)}
+                >
+                  elete
+                </span>
+              )}
             </div>
             <div onClick={openThisNote} onKeyPress={openThisNote}>
               <div
@@ -325,17 +324,8 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
         <div key={index}>
           <div className={props.darkmode + "card shadow"}>
             <div className={"clearfix"}>
-              <span
-                className="glyphicon glyphicon-remove d-inline-block p-2 cursor-pointer"
-                onClick={closeThisNote}
-              ></span>
-              <span
-                className="material-icons d-inline-block float-end p-2 cursor-pointer"
-                id="deleteNoteIcon"
-                onClick={() => deleteSelectedNote(index)}
-              >
-                delete
-              </span>
+              <CloseNoteButton closeNote={closeThisNote} />
+              <DeleteNoteButton deleteNote={() => deleteSelectedNote(index)} />
             </div>
             {appData.notesStore[appData.noteIndex].listMode ? (
               <EditableListedNote
@@ -394,13 +384,28 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
               }
             >
               <div className="d-flex justify-content-end">
-                <span
-                  className="material-icons d-inline-block p-2 cursor-pointer"
-                  id="deleteNoteIcon"
-                  onClick={() => deleteSelectedNote(index)}
-                >
-                  delete
-                </span>
+                {appData.tutorialMode ? (
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={<Tooltip>Delete this note</Tooltip>}
+                  >
+                    <span
+                      className="material-icons d-inline-block p-2 cursor-pointer"
+                      id="deleteNoteIcon"
+                      onClick={() => deleteSelectedNote(index)}
+                    >
+                      delete
+                    </span>
+                  </OverlayTrigger>
+                ) : (
+                  <span
+                    className="material-icons d-inline-block p-2 cursor-pointer"
+                    id="deleteNoteIcon"
+                    onClick={() => deleteSelectedNote(index)}
+                  >
+                    delete
+                  </span>
+                )}
               </div>
               <div onClick={openThisNote} onKeyPress={openThisNote}>
                 <div
@@ -436,16 +441,13 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
         <div className="clearfix">
           <NoteSearchField darkmode={props.darkmode} />
           <div>
-            <CreateButton
-              darkmode={props.darkmode + " create-note-button "}
-              create={createNewNote}
-            />
-            <NotesViewButton
-              darkmode={
-                props.darkmode + "float-end shadow notes-view-button-visibility"
-              }
-              changeViewOfNotes={changeViewOfNotes}
-            />
+            <CreateNoteButton darkmode={props.darkmode} />
+            <span className=" float-end notes-view-button-visibility">
+              <NotesViewButton
+                darkmode={props.darkmode + " shadow "}
+                changeViewOfNotes={changeViewOfNotes}
+              />
+            </span>
           </div>
           <div
             className={
@@ -472,17 +474,8 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
         <div>
           <div className={props.darkmode + "card shadow"}>
             <div className="clearfix">
-              <span
-                className="glyphicon glyphicon-remove d-inline-block p-2 cursor-pointer"
-                onClick={closeNote}
-              ></span>
-              <span
-                className="material-icons d-inline-block float-end p-2 cursor-pointer"
-                id="deleteNoteIcon"
-                onClick={deleteCreatingNote}
-              >
-                delete
-              </span>
+              <CloseNoteButton closeNote={closeNote} />
+              <DeleteNoteButton deleteNote={deleteCreatingNote} />
             </div>
             {appData.notesStore[appData.notesStore.length - 1].listMode ? (
               <CreatingListedNote
@@ -544,16 +537,15 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
       return (
         <div>
           <NoteSearchField darkmode={props.darkmode} />
-          <CreateButton
-            darkmode={props.darkmode + " create-note-button "}
-            create={createNewNote}
-          />
-          <NotesViewButton
-            darkmode={
-              props.darkmode + "float-end shadow notes-view-button-visibility"
-            }
-            changeViewOfNotes={changeViewOfNotes}
-          />
+          <div>
+            <CreateNoteButton darkmode={props.darkmode} />
+            <span className=" float-end notes-view-button-visibility">
+              <NotesViewButton
+                darkmode={props.darkmode + " shadow "}
+                changeViewOfNotes={changeViewOfNotes}
+              />
+            </span>
+          </div>
           <div
             className={
               appData.notesTableView
@@ -569,13 +561,15 @@ export default function NotesField(props: NotesFieldProps): JSX.Element {
       return (
         <div>
           <NoteSearchField darkmode={props.darkmode} />
-          <CreateButton darkmode={props.darkmode} create={createNewNote} />
-          <NotesViewButton
-            darkmode={
-              props.darkmode + "float-end shadow notes-view-button-visibility"
-            }
-            changeViewOfNotes={changeViewOfNotes}
-          />
+          <div>
+            <CreateNoteButton darkmode={props.darkmode} />
+            <span className=" float-end notes-view-button-visibility ">
+              <NotesViewButton
+                darkmode={props.darkmode + " shadow "}
+                changeViewOfNotes={changeViewOfNotes}
+              />
+            </span>
+          </div>
           <div
             className={
               appData.notesTableView

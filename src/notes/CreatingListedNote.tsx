@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
@@ -48,35 +49,82 @@ export default function CreatingListedNote(props: CreatingleListedNoteProps) {
   ].listModeTextOfNote.map((paragraph, index) => {
     return (
       <div key={index} className={"d-flex"}>
-        <input
-          type="checkbox"
-          name="listCheck"
-          defaultChecked={paragraph.checked ? true : false}
-          onClick={() => clickOnListedParagraph(index)}
-          onKeyPress={() => clickOnListedParagraph(index)}
-          onChange={switchChecked}
-        />
-        <textarea
-          className={
-            props.darkmode + (paragraph.checked ? "checkedParagraph" : "")
-          }
-          value={paragraph.text}
-          onClick={() => clickOnListedParagraph(index)}
-          onKeyPress={() => clickOnListedParagraph(index)}
-          onChange={changeListedParagraph}
-        ></textarea>
+        {appData.tutorialMode ? (
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip>Mark/unmark the paragraph as complete</Tooltip>}
+          >
+            <input
+              type="checkbox"
+              name="listCheck"
+              defaultChecked={paragraph.checked ? true : false}
+              onClick={() => clickOnListedParagraph(index)}
+              onKeyPress={() => clickOnListedParagraph(index)}
+              onChange={switchChecked}
+            />
+          </OverlayTrigger>
+        ) : (
+          <input
+            type="checkbox"
+            name="listCheck"
+            defaultChecked={paragraph.checked ? true : false}
+            onClick={() => clickOnListedParagraph(index)}
+            onKeyPress={() => clickOnListedParagraph(index)}
+            onChange={switchChecked}
+          />
+        )}
+        {appData.tutorialMode ? (
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip>Edit paragraph</Tooltip>}
+          >
+            <textarea
+              className={
+                props.darkmode + (paragraph.checked ? "checkedParagraph" : "")
+              }
+              value={paragraph.text}
+              onClick={() => clickOnListedParagraph(index)}
+              onKeyPress={() => clickOnListedParagraph(index)}
+              onChange={changeListedParagraph}
+            ></textarea>
+          </OverlayTrigger>
+        ) : (
+          <textarea
+            className={
+              props.darkmode + (paragraph.checked ? "checkedParagraph" : "")
+            }
+            value={paragraph.text}
+            onClick={() => clickOnListedParagraph(index)}
+            onKeyPress={() => clickOnListedParagraph(index)}
+            onChange={changeListedParagraph}
+          ></textarea>
+        )}
       </div>
     );
   });
 
   return (
     <div className={props.darkmode}>
-      <textarea
-        className={props.darkmode + " card-header "}
-        rows={3}
-        value={props.headerValue}
-        onChange={props.headerOnChange}
-      ></textarea>
+      {appData.tutorialMode ? (
+        <OverlayTrigger
+          placement="bottom"
+          overlay={<Tooltip>Edit header of note</Tooltip>}
+        >
+          <textarea
+            className={props.darkmode + " card-header "}
+            rows={3}
+            value={props.headerValue}
+            onChange={props.headerOnChange}
+          ></textarea>
+        </OverlayTrigger>
+      ) : (
+        <textarea
+          className={props.darkmode + " card-header "}
+          rows={3}
+          value={props.headerValue}
+          onChange={props.headerOnChange}
+        ></textarea>
+      )}
       <div className="card-body">{listModeText}</div>
     </div>
   );

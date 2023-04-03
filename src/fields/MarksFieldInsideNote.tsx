@@ -1,6 +1,7 @@
 import React from "react";
-import Mark from "../marks/Mark";
 import CreateButton from "../buttons/CreateButton";
+import DeleteButton from "../buttons/DeleteButton";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useAppSelector, useAppDispatch } from "../app/hooks";
 import {
   dataStore,
@@ -62,7 +63,7 @@ export default function MarksFieldInsideNote(
       <input
         type="checkbox"
         id={props.mark}
-        className="py-3 px-1 align-top cursor-pointer"
+        className="py-3 px-1 cursor-pointer"
         name="marks"
         value={props.mark}
         defaultChecked
@@ -71,7 +72,7 @@ export default function MarksFieldInsideNote(
       <input
         type="checkbox"
         id={props.mark}
-        className="py-3 px-1 align-top cursor-pointer"
+        className="py-3 px-1 cursor-pointer "
         name="marks"
         value={props.mark}
       />
@@ -81,15 +82,54 @@ export default function MarksFieldInsideNote(
   const MarksValues = appData.marksStore.map((mark, index) => {
     return (
       mark.includes(appData.searchMark) && (
-        <div key={mark}>
-          <Mark
-            mark={mark}
-            markClicked={props.markClicked}
-            markInput={<MarkInput mark={mark} />}
-            deleteMark={() => deleteThisMark(index)}
-            clickOnMark={() => saveMark(index)}
-            darkmode={props.darkmode}
-          />
+        <div key={mark} className="d-flex mx-1 my-3">
+          <div onClick={props.markClicked}>
+            <div className="align-top" onClick={() => saveMark(index)}>
+              {appData.tutorialMode ? (
+                <OverlayTrigger
+                  placement="bottom"
+                  overlay={
+                    <Tooltip>
+                      Add/remove <strong>{mark}</strong> mark in note.
+                    </Tooltip>
+                  }
+                >
+                  <Button className={props.darkmode + " shadow "}>
+                    <MarkInput mark={mark} />
+                    <span className="ms-2 align-top">{mark}</span>
+                  </Button>
+                </OverlayTrigger>
+              ) : (
+                <Button className={props.darkmode + " shadow "}>
+                  <MarkInput mark={mark} />
+                  <span className="ms-2 align-top">{mark}</span>
+                </Button>
+              )}
+            </div>
+          </div>
+          {appData.tutorialMode ? (
+            <OverlayTrigger
+              placement="bottom"
+              overlay={
+                <Tooltip>
+                  Delete <strong>{mark}</strong> mark. Also delete
+                  <strong>{" " + mark}</strong> mark from all notes.
+                </Tooltip>
+              }
+            >
+              <div>
+                <DeleteButton
+                  darkmode={props.darkmode + " h-100 py-0 mx-1 shadow"}
+                  delete={() => deleteThisMark(index)}
+                />
+              </div>
+            </OverlayTrigger>
+          ) : (
+            <DeleteButton
+              darkmode={props.darkmode + " h-100 py-0 mx-1 shadow"}
+              delete={() => deleteThisMark(index)}
+            />
+          )}
         </div>
       )
     );
@@ -99,7 +139,7 @@ export default function MarksFieldInsideNote(
     <div className={props.bgdarkmode}>
       <div className="input-group my-2">
         <input
-          className={props.darkmode + " form-control input-text shadow "}
+          className={props.darkmode + " form-control form-control-lg shadow "}
           type="text"
           value={appData.searchMark}
           placeholder="Search marks"

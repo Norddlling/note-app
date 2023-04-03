@@ -1,4 +1,4 @@
-import { Button } from "react-bootstrap";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useAppSelector } from "../app/hooks";
 import { dataStore } from "../features/dataStore/dataStoreSlice";
 
@@ -10,10 +10,33 @@ interface NotesViewButtonProps {
 export default function NotesViewButton(props: NotesViewButtonProps) {
   const appData = useAppSelector(dataStore);
 
-  return (
-    <span>
+  return appData.tutorialMode ? (
+    <OverlayTrigger
+      placement="bottom"
+      overlay={<Tooltip>Toggle list/table view of notes</Tooltip>}
+    >
+      <span className="d-inline-block">
+        <Button className={props.darkmode} onClick={props.changeViewOfNotes}>
+          <span
+            className={
+              appData.notesTableView
+                ? "glyphicon glyphicon-th-large py-1 custom-button"
+                : "glyphicon glyphicon-th-list py-1 custom-button"
+            }
+          ></span>
+        </Button>
+      </span>
+    </OverlayTrigger>
+  ) : (
+    <span className="d-inline-block">
       <Button className={props.darkmode} onClick={props.changeViewOfNotes}>
-        <span className={appData.notesTableView ? "glyphicon glyphicon-th-large py-1" : "glyphicon glyphicon-th-list py-1"}></span>
+        <span
+          className={
+            appData.notesTableView
+              ? "glyphicon glyphicon-th-large py-1 custom-button"
+              : "glyphicon glyphicon-th-list py-1 custom-button"
+          }
+        ></span>
       </Button>
     </span>
   );

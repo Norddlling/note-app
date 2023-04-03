@@ -1,6 +1,7 @@
 import React from "react";
 import "./styles.css";
 import NavBar from "./NavBar/NavBar";
+import TutorialAlert from "./Alerts/TutorialAlert";
 import NotesField from "./fields/NotesField";
 import MarksFieldOutsideNote from "./fields/MarksFieldOutsideNote";
 import { useAppSelector } from "./app/hooks";
@@ -17,6 +18,7 @@ export default function App() {
 
   return (
     <div className={bgdarkmode} id="appRoot">
+      <TutorialAlert darkmode={darkmode} />
       <div className="m-4">
         <NavBar bgdarkmode={bgdarkmode} darkmode={darkmode} />
         <main>

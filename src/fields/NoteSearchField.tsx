@@ -16,7 +16,7 @@ export default function NoteSearchField(props: { darkmode: string }) {
   return (
     <div className={props.darkmode + " mb-3 shadow "}>
       <input
-        className={" form-control input-text " + props.darkmode}
+        className={" form-control form-control-lg " + props.darkmode}
         value={appData.searchNote}
         placeholder="Search notes"
         onChange={filterNoteByText}

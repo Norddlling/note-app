@@ -25,6 +25,8 @@ type StoreTypes = {
   showMarksMenu: boolean;
   darkMode: boolean;
   notesTableView: boolean;
+  tutorialMode: boolean;
+  tutorialAlert: boolean;
 };
 
 const initialState: StoreTypes = {
@@ -41,7 +43,9 @@ const initialState: StoreTypes = {
   searchNote: "",
   showMarksMenu: false,
   darkMode: false,
-  notesTableView: false
+  notesTableView: false,
+  tutorialMode: false,
+  tutorialAlert: true
 };
 
 export const dataStoreSlice = createSlice({
@@ -264,9 +268,21 @@ export const dataStoreSlice = createSlice({
     },
     changeNightMode: (state) => {
       state.darkMode = !state.darkMode;
-    }, 
-    changeNotesView : (state) => {
-      state.notesTableView = !state.notesTableView
+    },
+    changeNotesView: (state) => {
+      state.notesTableView = !state.notesTableView;
+    },
+    toggleTutorialMode: (state) => {
+      state.tutorialMode = !state.tutorialMode;
+    },
+    enableTutorialMode: (state) => {
+      state.tutorialMode = true;
+    },
+    disableTutorialMode: (state) => {
+      state.tutorialMode = false;
+    },
+    disableTutorialAlert: (state) => {
+      state.tutorialAlert = false;
     }
   }
 });
@@ -307,7 +323,11 @@ export const {
   showMarksMenu,
   hideMarksMenu,
   changeNightMode,
-  changeNotesView
+  changeNotesView,
+  toggleTutorialMode,
+  enableTutorialMode,
+  disableTutorialMode,
+  disableTutorialAlert
 } = dataStoreSlice.actions;
 export const dataStore = (state: RootState) => state.savedData;
 export default dataStoreSlice.reducer;
